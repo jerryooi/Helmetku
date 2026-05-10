@@ -979,12 +979,21 @@
             // 计算屏幕与 1920x1080 内容区之间的比例
             const scaleX = window.innerWidth / 1920;
             const scaleY = window.innerHeight / 1080;
-            // 采用最小比例进行缩放，确保 1920x1080 永远全部可见，绝不裁剪！
-            const scale = Math.min(scaleX, scaleY); 
+            const baseScale = Math.min(scaleX, scaleY); 
             
-            document.querySelectorAll('.slide-content-scaler').forEach(el => {
-                el.style.transform = `translate(-50%, -50%) scale(${scale})`;
-            });
+            // 加入智能判断：屏幕宽度大于 1024px 通常是电脑显示器
+            if (window.innerWidth > 1024) {
+                // 💻 电脑版：保持绝对居中 (-50%, -50%)，不额外放大
+                document.querySelectorAll('.slide-content-scaler').forEach(el => {
+                    el.style.transform = `translate(-50%, -50%) scale(${baseScale})`;
+                });
+            } else {
+                // 📱 平板与手机版：内容放大 15%，并往上偏移 15% (-65%)
+                const finalScale = baseScale * 1.15; 
+                document.querySelectorAll('.slide-content-scaler').forEach(el => {
+                    el.style.transform = `translate(-50%, -65%) scale(${finalScale})`;
+                });
+            }
         }
         
         window.addEventListener('resize', applyScale);
