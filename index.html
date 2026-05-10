@@ -985,13 +985,13 @@
             // 加入智能判断：屏幕宽度大于 1024px 通常是电脑显示器
             if (window.innerWidth > 1024) {
                 // 💻 电脑版：内容放大 5% (乘以 1.05)，保持绝对居中 (-50%, -50%)
-                const desktopScale = baseScale * 1.05;
+                const desktopScale = baseScale * 1.08;
                 document.querySelectorAll('.slide-content-scaler').forEach(el => {
                     el.style.transform = `translate(-50%, -50%) scale(${desktopScale})`;
                 });
             } else {
                 // 📱 平板与手机版：内容放大 10% (乘以 1.10)，并往上偏移 (-60%)
-                const finalScale = baseScale * 1.08; 
+                const finalScale = baseScale * 1.10; 
                 document.querySelectorAll('.slide-content-scaler').forEach(el => {
                     el.style.transform = `translate(-50%, -55%) scale(${finalScale})`;
                 });
