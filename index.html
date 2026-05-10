@@ -196,6 +196,22 @@
         .slide-in-left.active { opacity: 1; transform: translateX(0); }
         .slide-in-right { opacity: 0; transform: translateX(100%); transition: all 0.8s cubic-bezier(0.25, 1, 0.5, 1); }
         .slide-in-right.active { opacity: 1; transform: translateX(0); }
+
+        /* ===== 针对 iPad 和手机端：强行缩小悬浮按钮 50% ===== */
+        @media screen and (max-width: 1024px) {
+            #lang-switcher {
+                transform: scale(0.5); /* 缩小一半 */
+                transform-origin: top right; /* 锁定在右上角缩小，防止位置跑偏 */
+            }
+            #page-index-btn {
+                transform: scale(0.5); /* 左下角目录按钮也一起缩小 */
+                transform-origin: bottom left; /* 锁定在左下角缩小 */
+            }
+            .index-item {
+                font-size: 1.5rem; /* 顺便把打开的目录字体稍微调小一点点 */
+                margin: 8px 0;
+            }
+        }
     </style>
 </head>
 <body>
