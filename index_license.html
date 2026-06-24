@@ -165,9 +165,18 @@
 33% { transform: translate(5%, 5%) scale(1.1); } 66% { transform: translate(-5%, 10%) scale(0.95); } 100% { transform: translate(10%, -5%) scale(1.05); } }
 
         @media screen and (max-width: 1024px) {
-            #lang-switcher { transform: scale(0.6); transform-origin: top right; }
-            #page-index-btn { transform: scale(0.6); transform-origin: bottom left; }
-            .index-item { font-size: 1.8rem; margin: 10px 0; }
+            #lang-switcher {
+                transform: scale(0.5);
+                transform-origin: top right;
+            }
+            #page-index-btn {
+                transform: scale(0.5);
+                transform-origin: bottom left;
+            }
+            .index-item {
+                font-size: 1.5rem;
+                margin: 8px 0;
+            }
         }
     </style>
 </head>
@@ -443,7 +452,7 @@
                 <div class="content-box" style="background: rgba(5, 11, 8, 0.6); backdrop-filter: blur(8px);"></div>
                 <div class="slide-content-scaler">
                     <div class="container text-center d-flex flex-column justify-content-center pt-2">
-                        <h2 class="text-green display-5" style="margin-top: 20px; margin-bottom: 10px;" data-i18n="s7_title">FINANCIAL PROJECTION - PARTNER PACKAGE A</h2>
+                        <h2 class="text-green display-5" style="margin-top: 60px; margin-bottom: 20px;" data-i18n="s7_title">FINANCIAL PROJECTION - PARTNER PACKAGE A</h2>
                         <h3 class="highlight mb-3 text-center" data-i18n="s7_sub">INITIAL INVESTMENT: RM 13,800</h3>
                         
                         <div class="glass-card reveal-step p-3 mx-auto" data-step-group="1" style="max-width: 1400px;">
@@ -516,7 +525,7 @@
                 <div class="content-box" style="background: rgba(5, 11, 8, 0.6); backdrop-filter: blur(8px);"></div>
                 <div class="slide-content-scaler">
                     <div class="container text-center d-flex flex-column justify-content-center pt-2">
-                        <h2 class="text-green display-5" style="margin-top: 20px; margin-bottom: 10px;" data-i18n="s8_title">FINANCIAL PROJECTION - PARTNER PACKAGE B</h2>
+                        <h2 class="text-green display-5" style="margin-top: 60px; margin-bottom: 20px;" data-i18n="s8_title">FINANCIAL PROJECTION - PARTNER PACKAGE B</h2>
                         <h3 class="highlight mb-5 text-center" data-i18n="s8_sub">INITIAL INVESTMENT: RM 12,800</h3>
                         
                         <div class="row g-4">
@@ -1229,14 +1238,14 @@
             const baseScale = Math.min(scaleX, scaleY); 
             
             if (window.innerWidth > 1024) {
-                const desktopScale = baseScale * 1.05;
+                const desktopScale = baseScale * 1.08;
                 document.querySelectorAll('.slide-content-scaler').forEach(el => {
                     el.style.transform = `translate(-50%, -50%) scale(${desktopScale})`;
                 });
             } else {
                 const finalScale = baseScale * 1.10; 
                 document.querySelectorAll('.slide-content-scaler').forEach(el => {
-                    el.style.transform = `translate(-50%, -60%) scale(${finalScale})`;
+                    el.style.transform = `translate(-50%, -55%) scale(${finalScale})`;
                 });
             }
         }
