@@ -1,0 +1,1116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>HelmetKu - Partnership & Licensing Pitch</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Outfit:wght@400;600;700;800&display=swap');
+
+        /* ===== 加载动画 ===== */
+        #loading-screen {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background: #050b08; z-index: 99999;
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+        }
+        #loading-screen .spinner {
+            width: 50px; height: 50px;
+            border: 4px solid rgba(255,255,255,0.1);
+            border-top-color: #10b981;
+            border-radius: 50%;
+            animation: spinload 1s linear infinite;
+        }
+        @keyframes spinload { to { transform: rotate(360deg); } }
+        #loading-screen p { color: #10b981; margin-top: 20px; font-size: 1.2rem; }
+
+        /* 终极全局重置 */
+        body { 
+            background-color: #050b08; 
+            color: #e2e8f0; 
+            margin: 0; 
+            width: 100vw; 
+            height: 100vh; 
+            overflow: hidden; 
+            font-family: 'Inter', "Helvetica Neue", Arial, sans-serif; 
+            touch-action: none; 
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            z-index: 0; 
+            -webkit-font-smoothing: antialiased;
+        }
+        
+        /* 竖屏拦截器 */
+        #rotate-device-prompt { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(5, 11, 8, 0.95); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); z-index: 100000; color: #fff; text-align: center; flex-direction: column; justify-content: center; align-items: center; }
+        .rotate-icon { width: 80px; height: 80px; margin-bottom: 20px; animation: spin 2s infinite ease-in-out, pulseIcon 2s infinite; color: #10b981; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 50% { transform: rotate(-90deg); } 100% { transform: rotate(-90deg); } }
+        @keyframes pulseIcon { 0%, 100% { filter: drop-shadow(0 0 5px rgba(16,185,129,0.5)); } 50% { filter: drop-shadow(0 0 20px rgba(16,185,129,1)); } }
+        @media screen and (max-aspect-ratio: 10/9) { #rotate-device-prompt { display: flex; } #presentation-container { display: none !important; } }
+
+        /* 全屏容器与滑轨 */
+        #presentation-container { width: 100vw; height: 100vh; position: relative; overflow: hidden; background-color: #050b08; }
+        #slides-wrapper { display: flex; width: 100vw; height: 100vh; transition: transform 0.8s cubic-bezier(0.25, 1, 0.2, 1); will-change: transform; }
+        .pitch-section { flex: 0 0 100vw; width: 100vw; height: 100vh; background-size: cover; background-position: center; background-repeat: no-repeat; position: relative; overflow: hidden; }
+        .content-box { background: rgba(5, 11, 8, 0.7); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); width: 100%; height: 100%; position: absolute; top: 0; left: 0; z-index: 1; }
+
+        /* 核心缩放画板 (1920x1080) */
+        .slide-content-scaler { width: 1920px; height: 1080px; position: absolute; top: 50%; left: 50%; transform-origin: center center; z-index: 2; display: flex; align-items: center; justify-content: center; }
+        .container { min-width: 1600px !important; max-width: 1600px !important; width: 1600px !important; margin: 0 auto; height: 100%; display: flex; flex-direction: column; justify-content: center; }
+
+        /* UI 与排版样式 */
+        h1, h2, h3, h4, h5 { font-family: 'Outfit', sans-serif; color: #ffffff; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
+        h1 { text-shadow: 0 10px 30px rgba(0,0,0,0.8); }
+        p, li, td, th { color: #cbd5e1; font-weight: 400; text-shadow: 0 2px 4px rgba(0,0,0,0.3); }
+        .highlight { color: #fbbf24; font-weight: 600; text-shadow: 0 0 15px rgba(251, 191, 36, 0.3); }
+        .text-green { color: #10b981 !important; font-weight: 700; text-shadow: 0 0 15px rgba(16, 185, 129, 0.3); }
+        
+        .glass-card { background: linear-gradient(145deg, rgba(255, 255, 255, 0.06) 0%, rgba(255, 255, 255, 0.01) 100%); backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px); padding: 40px; border-radius: 28px; border: 1px solid rgba(255, 255, 255, 0.08); border-top: 1px solid rgba(255, 255, 255, 0.15); border-left: 1px solid rgba(255, 255, 255, 0.15); box-shadow: 0 30px 60px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1); height: 100%; position: relative; overflow: hidden; transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.4s ease; }
+        .glass-card:hover { transform: translateY(-5px); box-shadow: 0 40px 80px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.2); border: 1px solid rgba(255, 255, 255, 0.12); border-top: 1px solid rgba(255, 255, 255, 0.2); border-left: 1px solid rgba(255, 255, 255, 0.2); }
+
+        .green-glass-card { background: linear-gradient(145deg, rgba(16, 185, 129, 0.2) 0%, rgba(5, 150, 105, 0.1) 100%); backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px); padding: 45px; border-radius: 35px; border: 1px solid rgba(16, 185, 129, 0.3); border-top: 1px solid rgba(52, 211, 153, 0.5); box-shadow: 0 30px 60px rgba(0, 0, 0, 0.5), 0 0 40px rgba(16, 185, 129, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.1); color: #fff; }
+
+        /* 固态 UI 控件 */
+        #lang-switcher { position: fixed; top: 30px; right: 30px; z-index: 9999; display: flex; gap: 8px; background: rgba(15, 23, 42, 0.6); padding: 6px; border-radius: 40px; backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.1); box-shadow: 0 10px 25px rgba(0,0,0,0.5); transition: transform 0.3s ease; }
+        #lang-switcher:hover { transform: scale(1.02); }
+        .lang-btn { background: transparent; color: #94a3b8; border: none; border-radius: 30px; padding: 10px 24px; cursor: pointer; font-family: 'Outfit', sans-serif; font-weight: 600; transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); font-size: 1.1rem; }
+        .lang-btn:hover { color: #fff; background: rgba(255, 255, 255, 0.05); }
+        .lang-btn.active { background: #10b981; color: #fff; box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4); text-shadow: none; transform: scale(1.05); }
+
+        /* 索引按钮 */
+        #page-index-btn { position: fixed; left: 30px; bottom: 30px; z-index: 9999; background: rgba(16, 185, 129, 0.15); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.4); border-radius: 50%; width: 64px; height: 64px; cursor: pointer; backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); display: flex; align-items: center; justify-content: center; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
+        #page-index-btn:hover { background: rgba(16, 185, 129, 0.8); color: white; transform: scale(1.15) rotate(90deg); box-shadow: 0 15px 35px rgba(16, 185, 129, 0.4); }
+        #page-index-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(5, 11, 8, 0.95); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); z-index: 9998; display: none; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.4s ease; overflow-y: auto; -webkit-overflow-scrolling: touch; }
+        #page-index-overlay.active { display: flex; opacity: 1; }
+        .index-list { list-style: none; padding: 40px 20px; text-align: left; max-height: 90vh; overflow-y: auto; -webkit-overflow-scrolling: touch; }
+        .index-item { margin: 18px 0; font-family: 'Outfit', sans-serif; font-size: 2.4rem; cursor: pointer; transition: all 0.3s ease; text-transform: uppercase; font-weight: 700; color: #64748b; letter-spacing: 2px; }
+        .index-item:hover { color: #fff; transform: translateX(10px); }
+        .index-item span { color: #10b981; margin-right: 25px; font-size: 1.6rem; font-weight: 800; opacity: 0.8; }
+
+        /* 表格样式 */
+        .specs-table td { padding: 12px 18px !important; font-size: 1.25rem; vertical-align: middle; border-bottom: 1px solid rgba(255,255,255,0.06) !important; color: #e2e8f0; }
+        .specs-table tr:last-child td { border-bottom: none !important; }
+        .specs-table tr { transition: background 0.3s ease; }
+        .specs-table tr:hover { background: rgba(255, 255, 255, 0.03); }
+
+        .compare-table { border-collapse: separate; border-spacing: 0 10px; } 
+        .compare-table td { vertical-align: middle; padding: 20px !important; font-size: 1.3rem; border: none !important; }
+        .compare-table td:first-child { background: rgba(255, 255, 255, 0.03); border-radius: 16px 0 0 16px; border: 1px solid rgba(255, 255, 255, 0.05); border-right: none; }
+        .compare-table td:last-child { background: linear-gradient(90deg, rgba(16, 185, 129, 0.05) 0%, rgba(16, 185, 129, 0.12) 100%); border-radius: 0 16px 16px 0; border: 1px solid rgba(16, 185, 129, 0.2); border-left: none; }
+        .center-pillar { background: linear-gradient(135deg, #f59e0b 0%, #ea580c 100%); color: #fff !important; font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 1.6rem; border-radius: 20px; box-shadow: 0 15px 30px rgba(234, 88, 12, 0.4), inset 0 2px 5px rgba(255,255,255,0.3); border: 1px solid rgba(255,255,255,0.2) !important; transform: scale(1.1); position: relative; z-index: 10; letter-spacing: 1px; }
+
+        .finance-table { border-collapse: separate; border-spacing: 0; }
+        .finance-table th { border-bottom: 2px solid #10b981 !important; font-family: 'Outfit', sans-serif; font-weight: 600; letter-spacing: 1px; padding: 14px !important; font-size: 1.2rem !important; }
+        .finance-table td { padding: 14px 18px !important; vertical-align: middle; border-bottom: 1px dashed rgba(255,255,255,0.08) !important; border-top: none !important; color: #ffffff; font-size: 1.25rem !important; }
+        .finance-table tr:hover td { background: rgba(255, 255, 255, 0.02); }
+        .finance-table tr:last-child td { border-bottom: none !important; }
+        .golden-arrow { position: absolute; left: -50px; top: 12px; font-size: 40px; color: #fbbf24; transform: rotate(45deg); filter: drop-shadow(0 0 10px rgba(251, 191, 36, 0.5)); animation: floatArrow 2s infinite ease-in-out; }
+        @keyframes floatArrow { 0%, 100% { transform: rotate(45deg) translate(0, 0); } 50% { transform: rotate(45deg) translate(-8px, -8px); } }
+
+        .stat-row { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px dashed rgba(255,255,255,0.08); padding: 14px 0; transition: background 0.3s ease; }
+        .stat-row:hover { background: rgba(255,255,255,0.02); border-radius: 8px; padding: 14px 10px; margin: 0 -10px; }
+        .stat-row:last-child { border-bottom: none; }
+        .card-glow { box-shadow: 0 0 40px rgba(16, 185, 129, 0.2), inset 0 0 20px rgba(16, 185, 129, 0.1) !important; border-color: rgba(16, 185, 129, 0.4) !important; }
+
+        /* 动画 */
+        .reveal-step { opacity: 0; transform: translateY(25px); transition: opacity 0.6s cubic-bezier(0.25, 1, 0.5, 1), transform 0.6s cubic-bezier(0.25, 1, 0.5, 1); }
+        .reveal-step.active { opacity: 1; transform: translateY(0); }
+
+        .slide-6-imgs { position: relative; display: flex; align-items: center; justify-content: center; height: 800px; width: 100%; }
+        .slide-6-imgs img { position: absolute; transition: opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1), transform 0.6s cubic-bezier(0.4, 0, 0.2, 1), filter 0.6s ease; max-height: 100%; width: auto; left: 50%; top: 50%; transform: translate(-50%, -50%) scale(0.95); filter: drop-shadow(0 20px 40px rgba(0,0,0,0.5)); }
+        .slide-6-imgs img[style*="opacity: 1"] { transform: translate(-50%, -50%) scale(1); filter: drop-shadow(0 30px 60px rgba(16, 185, 129, 0.3)); }
+        
+        #s6-img-1, #s6-img-2, #s6-img-3 { opacity: 0; border-radius: 20px; }
+        #section-6:has(.s6-step-1.active) #s6-img-base { opacity: 0; }
+        #section-6:has(.s6-step-1.active) #s6-img-1 { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+        #section-6:has(.s6-step-2.active) #s6-img-1 { opacity: 0; }
+        #section-6:has(.s6-step-2.active) #s6-img-2 { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+        #section-6:has(.s6-step-3.active) #s6-img-2 { opacity: 0; }
+        #section-6:has(.s6-step-3.active) #s6-img-3 { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+        #section-6:has([data-step-group="4"].active) #s6-img-3 { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+
+        .machine-pointer { position: absolute; background: rgba(15, 23, 42, 0.9); border-left: 4px solid #10b981; padding: 14px 24px; border-radius: 8px 12px 12px 8px; box-shadow: 0 10px 25px rgba(0,0,0,0.6); white-space: nowrap; font-size: 1.35rem; z-index: 10; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); transition: transform 0.3s ease; }
+        .machine-pointer:hover { transform: translateX(5px); }
+        .machine-pointer::before { content: ''; position: absolute; left: -34px; top: 50%; transform: translateY(-50%); width: 30px; height: 2px; background: linear-gradient(90deg, transparent, #10b981); }
+
+        .premium-icon-wrapper { width: 80px; height: 80px; min-width: 80px; background: rgba(16, 185, 129, 0.1); border-radius: 20px; display: flex; align-items: center; justify-content: center; border: 1px solid rgba(16, 185, 129, 0.3); box-shadow: inset 0 0 20px rgba(16, 185, 129, 0.1); transition: all 0.3s ease; }
+        .glass-card:hover .premium-icon-wrapper { transform: scale(1.1) rotate(5deg); background: rgba(16, 185, 129, 0.2); border-color: rgba(16, 185, 129, 0.5); box-shadow: 0 10px 20px rgba(16, 185, 129, 0.2), inset 0 0 20px rgba(16, 185, 129, 0.2); }
+        .premium-icon { width: 40px; height: 40px; color: #10b981; filter: drop-shadow(0 0 8px rgba(16,185,129,0.6)); transition: all 0.3s ease; }
+        .glass-card:hover .premium-icon { color: #34d399; filter: drop-shadow(0 0 12px rgba(52,211,153,0.8)); }
+
+        /* 第12页 Contact Us 照片 */
+        .s12-person { position: absolute; bottom: 0; height: 80%; z-index: 10; filter: drop-shadow(5px 5px 15px rgba(0,0,0,0.5)); }
+
+        @media screen and (max-width: 1024px) {
+            #lang-switcher { transform: scale(0.5); transform-origin: top right; }
+            #page-index-btn { transform: scale(0.5); transform-origin: bottom left; }
+            .index-item { font-size: 1.5rem; margin: 8px 0; }
+            .index-list { padding: 20px 15px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ===== 加载动画 ===== -->
+    <div id="loading-screen">
+        <div class="spinner"></div>
+        <p>Loading...</p>
+    </div>
+
+    <div id="rotate-device-prompt">
+        <svg class="rotate-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 2.01A10 10 0 0 0 3.01 15"></path><path d="M13 2l3-3 3 3"></path><rect x="5" y="8" width="14" height="8" rx="2" ry="2" transform="rotate(-90 12 12)"></rect></svg>
+        <h2 data-i18n="rotate_title">Please rotate your device</h2>
+        <p class="fs-4 text-white" data-i18n="rotate_sub">For the best presentation experience.</p>
+        <div class="mt-4 d-flex gap-3">
+            <button class="btn btn-outline-light btn-lg lang-btn-prompt" onclick="setLang('en')">EN</button>
+            <button class="btn btn-outline-light btn-lg lang-btn-prompt" onclick="setLang('zh')">中文</button>
+            <button class="btn btn-outline-light btn-lg lang-btn-prompt" onclick="setLang('ms')">BM</button>
+        </div>
+    </div>
+
+    <div id="lang-switcher">
+        <button class="lang-btn active" onclick="setLang('en')">EN</button>
+        <button class="lang-btn" onclick="setLang('zh')">中文</button>
+        <button class="lang-btn" onclick="setLang('ms')">BM</button>
+    </div>
+
+    <div id="page-index-btn" onclick="toggleIndex()">
+        <svg width="30" height="30" fill="currentColor" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M2 12.5a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11a.5.5 0 0 1-.5-.5zm0-3a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11a.5.5 0 0 1-.5-.5zm0-3a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11a.5.5 0 0 1-.5-.5zm0-3a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11a.5.5 0 0 1-.5-.5zm0-3a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11a.5.5 0 0 1-.5-.5zm0-3a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11a.5.5 0 0 1-.5-.5z"/></svg>
+    </div>
+
+    <div id="page-index-overlay" onclick="toggleIndex()">
+        <ul class="index-list">
+            <li class="index-item" onclick="jumpTo(0)" data-i18n="idx_0"><span>01</span> Cover</li>
+            <li class="index-item" onclick="jumpTo(1)" data-i18n="idx_1"><span>02</span> Machine Specs</li>
+            <li class="index-item" onclick="jumpTo(2)" data-i18n="idx_2"><span>03</span> Market Pain Points</li>
+            <li class="index-item" onclick="jumpTo(3)" data-i18n="idx_3"><span>04</span> Our Solution</li>
+            <li class="index-item" onclick="jumpTo(4)" data-i18n="idx_4"><span>05</span> Digital System</li>
+            <li class="index-item" onclick="jumpTo(5)" data-i18n="idx_5"><span>06</span> Product Features</li>
+            <li class="index-item" onclick="jumpTo(6)" data-i18n="idx_6"><span>07</span> Package A Projection</li>
+            <li class="index-item" onclick="jumpTo(7)" data-i18n="idx_7"><span>08</span> Package B Projection</li>
+            <li class="index-item" onclick="jumpTo(8)" data-i18n="idx_8"><span>09</span> Promo Package A</li>
+            <li class="index-item" onclick="jumpTo(9)" data-i18n="idx_9"><span>10</span> Promo Package B</li>
+            <li class="index-item" onclick="jumpTo(10)" data-i18n="idx_10"><span>11</span> System Config</li>
+            <li class="index-item" onclick="jumpTo(11)" data-i18n="idx_11"><span>12</span> Contact Us</li>
+        </ul>
+    </div>
+
+    <div id="presentation-container">
+        <div id="slides-wrapper">
+            
+            <!-- ========== SLIDE 1: COVER ========== -->
+            <section class="pitch-section" style="background-image: url('BG_1.jpg');">
+                <div class="content-box" style="background: rgba(5, 11, 8, 0.6); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);"></div>
+                <div class="slide-content-scaler">
+                    <div class="container">
+                        <div class="row align-items-center g-5">
+                            <div class="col-7 text-start">
+                                <img src="Logo.png" alt="Logo" style="max-height: 150px; margin-bottom: 15px; display: block;">
+                                <h1 class="fw-bold mb-3" style="font-size: 4.4rem; line-height: 1.1;" data-i18n="s1_title">AUTOMATIC HELMET CLEANING MACHINE</h1>
+                                <p class="highlight mt-4" style="font-size: 2.1rem;" data-i18n="s1_sub">A High-Frequency, Cash-Flow, and Scalable Offline Automation Service</p>
+                                <div class="mt-5 d-inline-block px-4 py-3 rounded" style="background: rgba(200,0,0,0.8);">
+                                    <h4 class="mb-1 text-white" data-i18n="s1_plan">PROJECT FINANCING PLAN</h4>
+                                    <p class="mb-0 small" style="opacity: 0.9;" data-i18n="s1_private">Private Roadshow - Sophisticated Investors Only</p>
+                                </div>
+                            </div>
+                            <div class="col-5 text-center">
+                                <img src="Machine.png" alt="Machine" class="img-fluid" style="max-height: 700px; filter: drop-shadow(0 0 20px rgba(255,255,255,0.2));">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ========== SLIDE 2: MACHINE SPECS ========== -->
+            <section class="pitch-section" style="background-image: url('BG_1.jpg');">
+                <div class="content-box" style="background: rgba(5, 11, 8, 0.6); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);"></div>
+                <div class="slide-content-scaler">
+                    <div class="container">
+                        <h2 class="text-green display-4 text-center" style="margin-bottom: 30px;" data-i18n="s2_title">MACHINE SPECIFICATIONS</h2>
+                        <div class="row align-items-center g-5">
+                            <div class="col-4 text-center position-relative reveal-step" data-step-group="1">
+                                <img src="Machine.png" alt="Machine Spec" class="img-fluid rounded" style="max-height: 550px; filter: drop-shadow(0 0 20px rgba(76, 175, 80, 0.4));">
+                                <div class="machine-pointer text-white fw-bold" style="top: 18%; right: -50px;" data-i18n="s2_lbl1">21.5" HD Touch Screen</div>
+                                <div class="machine-pointer text-white fw-bold" style="top: 48%; right: -30px;" data-i18n="s2_lbl2">Helmet Chambers</div>
+                            </div>
+                            <div class="col-8">
+                                <div class="glass-card reveal-step p-3" data-step-group="2">
+                                    <table class="table table-dark table-hover specs-table align-middle mb-0" style="--bs-table-bg: transparent;">
+                                        <tbody>
+                                            <tr><td class="text-green fw-bold" style="width: 35%;" data-i18n="s2_c1">Screen</td><td data-i18n="s2_d1">21.5-inch HD touch screen</td></tr>
+                                            <tr><td class="text-green fw-bold" data-i18n="s2_c2">Sterilization Method</td><td data-i18n="s2_d2">High-temperature steam, ozone, UV</td></tr>
+                                            <tr><td class="text-green fw-bold" data-i18n="s2_c3">Cleaning Chambers</td><td data-i18n="s2_d3">Single / Dual</td></tr>
+                                            <tr><td class="text-green fw-bold" data-i18n="s2_c4">Payment Methods</td><td data-i18n="s2_d4">Banknote / Coin / Card / Token / QR code</td></tr>
+                                            <tr><td class="text-green fw-bold" data-i18n="s2_c5">IoT Management</td><td data-i18n="s2_d5">PC, Mobile</td></tr>
+                                            <tr><td class="text-green fw-bold" data-i18n="s2_c6">Languages</td><td data-i18n="s2_d6">Chinese / English / Customizable</td></tr>
+                                            <tr><td class="text-green fw-bold" data-i18n="s2_c7">Input Power</td><td data-i18n="s2_d7">110V~240v 50/60HZ</td></tr>
+                                            <tr><td class="text-green fw-bold" data-i18n="s2_c8">Rated Power</td><td data-i18n="s2_d8">Dual: 2500W | Single: 1400W</td></tr>
+                                            <tr><td class="text-green fw-bold" data-i18n="s2_c9">Net Weight</td><td data-i18n="s2_d9">Dual: 118kg | Single: 107kg</td></tr>
+                                            <tr><td class="text-green fw-bold" data-i18n="s2_c10">Fragrance</td><td data-i18n="s2_d10">6 fragrance options</td></tr>
+                                            <tr><td class="text-green fw-bold" data-i18n="s2_c11">Product Dimensions</td><td data-i18n="s2_d11">56 x 65 x 197cm</td></tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ========== SLIDE 3: MARKET PAIN POINTS ========== -->
+            <section class="pitch-section" style="background-image: url('BG_8.jpg');">
+                <div class="content-box"></div>
+                <div class="slide-content-scaler">
+                    <div class="container">
+                        <div class="row align-items-center g-4">
+                            <div class="col-6 text-start">
+                                <h2 class="text-green mb-3 display-5" data-i18n="s3_title">OVER <span class="highlight">16,700,000</span> <br> REGISTERED MOTORCYCLES IN MALAYSIA</h2>
+                                <p class="fs-5" data-i18n="s3_desc1">The ever-growing number of motorcyclists represents our massive potential customer base! Demand remains high daily, regardless of the dry or rainy season.</p>
+                                <hr style="border-color: rgba(255,255,255,0.3); margin: 25px 0;">
+                                <p class="highlight fs-5 reveal-step" data-step-group="1" data-i18n="s3_desc2">Motorcyclists are actively seeking professional solutions to sanitize, sterilize, and dry their helmets!</p>
+                                <h4 class="mt-4 fs-4 reveal-step" data-step-group="2" data-i18n="s3_pain">REAL-WORLD PAIN POINTS:</h4>
+                                <ul class="fs-5 ps-3">
+                                    <li class="reveal-step" data-step-group="2" data-i18n="s3_p1">Helmets remain damp for long periods with persistent odors</li>
+                                    <li class="reveal-step" data-step-group="3" data-i18n="s3_p2">High bacterial growth, but users find manual washing tedious</li>
+                                    <li class="reveal-step" data-step-group="4" data-i18n="s3_p3">Lack of professional equipment and time for proper air-drying at home</li>
+                                    <li class="reveal-step" data-step-group="5" data-i18n="s3_p4">Delivery riders and commuters have to reuse sweaty helmets throughout the day</li>
+                                </ul>
+                            </div>
+                            <div class="col-6 text-center">
+                                <div class="d-flex flex-column align-items-center gap-3">
+                                    <img src="page_2.1.png" alt="Analysis" onerror="this.style.display='none'" class="img-fluid reveal-step" data-step-group="1" style="max-height: 300px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1);">
+                                    <img src="Page_2.2.png" alt="Guy" onerror="this.style.display='none'" class="img-fluid reveal-step" data-step-group="2" style="max-height: 300px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1);">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ========== SLIDE 4: OUR SOLUTION ========== -->
+            <section class="pitch-section" style="background-image: url('BG_1.jpg');">
+                <div class="content-box" style="background: rgba(5, 11, 8, 0.6); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);"></div>
+                <div class="slide-content-scaler">
+                    <div class="container text-center d-flex flex-column justify-content-center pt-2">
+                        <h2 class="text-green display-4" style="margin-top: 20px; margin-bottom: 15px;" data-i18n="s4_title">GENTLE CLEAN, ODOR-FREE, LONG-LASTING FRESHNESS</h2>
+                        <div class="glass-card reveal-step mx-auto" data-step-group="1" style="padding: 20px; max-width: 1350px; max-height: 70%; overflow-y: auto; overflow-x: hidden;">
+                            <table class="table table-hover compare-table align-middle mb-0 text-center">
+                                <thead>
+                                    <tr>
+                                        <th style="width: 35%; color: #000; font-size: 1.6rem; border: none;" data-i18n="s4_h1">Conventional Wash</th>
+                                        <th style="width: 30%; border: none;"></th>
+                                        <th style="width: 35%; color: #000; font-size: 1.6rem; border: none;" data-i18n="s4_h3">Machine Cleaning</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr class="reveal-step" data-step-group="2">
+                                        <td style="color: #bbb;" data-i18n="s4_r1_c1">Soaking, Rubbing, High-pressure</td>
+                                        <td class="center-pillar" data-i18n="s4_r1_c2">Method</td>
+                                        <td class="text-green fw-bold" data-i18n="s4_r1_c3">High-temperature steam, Ozone disinfection, UV</td>
+                                    </tr>
+                                    <tr class="reveal-step" data-step-group="3">
+                                        <td style="color: #bbb;" data-i18n="s4_r2_c1">EPS foam damage, Liner deformation</td>
+                                        <td class="center-pillar" data-i18n="s4_r2_c2">Damage</td>
+                                        <td class="text-green fw-bold" data-i18n="s4_r2_c3">Non-damaging cleaning, Structural integrity</td>
+                                    </tr>
+                                    <tr class="reveal-step" data-step-group="4">
+                                        <td style="color: #bbb;" data-i18n="s4_r3_c1">Residual bacteria / odors</td>
+                                        <td class="center-pillar" data-i18n="s4_r3_c2">Sterilization</td>
+                                        <td class="text-green fw-bold" data-i18n="s4_r3_c3">High-efficiency Sterilization, odor source elimination</td>
+                                    </tr>
+                                    <tr class="reveal-step" data-step-group="5">
+                                        <td style="color: #bbb;" data-i18n="s4_r4_c1">Natural drying / Slow</td>
+                                        <td class="center-pillar" data-i18n="s4_r4_c2">Drying</td>
+                                        <td class="text-green fw-bold" data-i18n="s4_r4_c3">360° rapid drying, Ready to use</td>
+                                    </tr>
+                                    <tr class="reveal-step" data-step-group="6">
+                                        <td style="color: #bbb;" data-i18n="s4_r5_c1">Residual bacteria and odors</td>
+                                        <td class="center-pillar" data-i18n="s4_r5_c2">Freshness</td>
+                                        <td class="text-green fw-bold" data-i18n="s4_r5_c3">Deep clean, long-lasting antibacterial, fresh all day</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ========== SLIDE 5: DIGITAL SYSTEM ========== -->
+            <section class="pitch-section" style="background-image: url('BG_1.jpg');">
+                <div class="content-box" style="background: rgba(5, 11, 8, 0.6); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);"></div>
+                <div class="slide-content-scaler">
+                    <div class="container text-center d-flex flex-column justify-content-center pt-2">
+                        <h2 class="text-green display-4" style="margin-bottom: 20px;" data-i18n="s5_title">FULLY INTEGRATED BACKEND SYSTEM</h2>
+                        <p class="fs-3 text-white mb-5" data-i18n="s5_sub">Real-time machine monitoring | Income tracking | Sales trend and report</p>
+                        <div class="row g-5">
+                            <div class="col-6">
+                                <div class="glass-card reveal-step d-flex align-items-center text-start gap-4 p-5 h-100" data-step-group="1">
+                                    <div class="premium-icon-wrapper">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="premium-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
+                                    </div>
+                                    <div>
+                                        <h3 class="text-white mb-2" data-i18n="s5_f1_t">Remote Monitoring</h3>
+                                        <p class="fs-4 text-white mb-0" data-i18n="s5_f1_d">Remote monitoring of equipment status and online/offline tracking.</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="glass-card reveal-step d-flex align-items-center text-start gap-4 p-5 h-100" data-step-group="2">
+                                    <div class="premium-icon-wrapper">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="premium-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" /></svg>
+                                    </div>
+                                    <div>
+                                        <h3 class="text-white mb-2" data-i18n="s5_f2_t">Revenue Synchronization</h3>
+                                        <p class="fs-4 text-white mb-0" data-i18n="s5_f2_d">Real-time order revenue data synchronization and sales tracking.</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="glass-card reveal-step d-flex align-items-center text-start gap-4 p-5 h-100" data-step-group="3">
+                                    <div class="premium-icon-wrapper">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="premium-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>
+                                    </div>
+                                    <div>
+                                        <h3 class="text-white mb-2" data-i18n="s5_f3_t">Smart Advertising</h3>
+                                        <p class="fs-4 text-white mb-0" data-i18n="s5_f3_d">Smart advertising management for the 21.5-inch HD screen.</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="glass-card reveal-step d-flex align-items-center text-start gap-4 p-5 h-100" data-step-group="4">
+                                    <div class="premium-icon-wrapper">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="premium-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                                    </div>
+                                    <div>
+                                        <h3 class="text-white mb-2" data-i18n="s5_f4_t">Smart Cleaning Mode</h3>
+                                        <p class="fs-4 text-white mb-0" data-i18n="s5_f4_d">Smart cleaning mode adjustment and parameter configurations.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ========== SLIDE 6: PRODUCT FEATURES ========== -->
+            <section class="pitch-section" id="section-6" style="background-image: url('BG_1.jpg');">
+                <div class="content-box" style="background: rgba(5, 11, 8, 0.6); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);"></div>
+                <div class="slide-content-scaler">
+                    <div class="container">
+                        <div class="row align-items-center g-5">
+                            <div class="col-5 text-center">
+                                <div class="slide-6-imgs">
+                                    <img src="Machine.png" id="s6-img-base" class="img-fluid" alt="Machine">
+                                    <img src="Helmet Cleaning_3.png" id="s6-img-1" class="img-fluid" alt="Fog Dry Cleaning" style="border-radius: 12px;">
+                                    <img src="Helmet Cleaning_1.png" id="s6-img-2" class="img-fluid" alt="UV Sterilization" style="border-radius: 12px;">
+                                    <img src="Helmet Cleaning_2.png" id="s6-img-3" class="img-fluid" alt="Heat Drying" style="border-radius: 12px;">
+                                </div>
+                            </div>
+                            <div class="col-7 text-start ps-5">
+                                <h2 class="text-green mb-3 display-5" data-i18n="s6_title">AUTOMATIC HELMET CLEANING MACHINE</h2>
+                                <p class="highlight fs-4 mb-4" data-i18n="s6_sub">Efficient and Convenient 360° All-Around Cleaning Solution</p>
+                                <hr style="border-color: rgba(255,255,255,0.3); margin: 25px 0;">
+                                <ul class="fs-4 list-unstyled mb-4" style="line-height: 2.2;">
+                                    <li class="reveal-step s6-step-1" data-step-group="1" data-i18n="s6_f1">💨 Fog Dry Cleaning</li>
+                                    <li class="reveal-step s6-step-2" data-step-group="2" data-i18n="s6_f2">☀️ UV Sterilization</li>
+                                    <li class="reveal-step s6-step-3" data-step-group="3" data-i18n="s6_f3">🔥 Heat Drying and Sterilization</li>
+                                </ul>
+                                <div class="row fs-5 mt-4 g-3 reveal-step" data-step-group="4" style="border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px;">
+                                    <div class="col-6" data-i18n="s6_i1">🕒 5-8 Mins Done</div>
+                                    <div class="col-6" data-i18n="s6_i2">✨ Dry Wash & Sterilize</div>
+                                    <div class="col-6" data-i18n="s6_i3">📱 QR / Cashless</div>
+                                    <div class="col-6" data-i18n="s6_i4">📐 Small Footprint</div>
+                                    <div class="col-6" data-i18n="s6_i5">🚫 No Water Needed</div>
+                                    <div class="col-6" data-i18n="s6_i6">⏳ 24/7 Available</div>
+                                    <div class="col-12 text-warning fw-bold" data-i18n="s6_i7">🔄 360° Full Coverage</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ========== SLIDE 7: PACKAGE A PROJECTION ========== -->
+            <section class="pitch-section" style="background-image: url('BG_1.jpg');">
+                <div class="content-box" style="background: rgba(5, 11, 8, 0.6); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);"></div>
+                <div class="slide-content-scaler">
+                    <div class="container text-center d-flex flex-column justify-content-center pt-2">
+                        <h2 class="text-green display-5" style="margin-top: 60px; margin-bottom: 20px;" data-i18n="s7_title">FINANCIAL PROJECTION - PARTNER PACKAGE A</h2>
+                        <h3 class="highlight mb-3 text-center" data-i18n="s7_sub">INITIAL INVESTMENT: RM 13,800</h3>
+                        
+                        <div class="glass-card reveal-step p-3 mx-auto" data-step-group="1" style="max-width: 1400px;">
+                            <table class="table table-hover finance-table align-middle mb-0 text-center" style="--bs-table-bg: transparent; border-collapse: separate; border-spacing: 0;">
+                                <thead>
+                                    <tr style="background: rgba(255,255,255,0.05);">
+                                        <th style="width: 25%; text-align: left; border-top-left-radius: 12px;" class="text-white" data-i18n="s7_h_desc">📈 Daily/monthly sales /<br>Average selling price</th>
+                                        <th style="width: 25%; border-left: 1px solid rgba(255,255,255,0.1);" class="text-info" data-i18n="s7_h_s1">SCENARIO 1:<br>Conservative<br><span class="text-white" style="font-size: 1.1rem;">(15/450 washes)</span></th>
+                                        <th style="width: 25%; background: rgba(76, 175, 80, 0.1); border-left: 1px solid rgba(255,255,255,0.1); border-right: 1px solid rgba(255,255,255,0.1);" class="text-warning" data-i18n="s7_h_s2">SCENARIO 2:<br>Standard<br><span class="text-white" style="font-size: 1.1rem;">(25/750 washes)</span></th>
+                                        <th style="width: 25%; border-top-right-radius: 12px;" class="text-info" data-i18n="s7_h_s3">SCENARIO 3:<br>Optimal<br><span class="text-white" style="font-size: 1.1rem;">(35/1050 washes)</span></th>
+                                    </tr>
+                                </thead>
+                                <tbody class="text-white">
+                                    <tr class="reveal-step" data-step-group="2">
+                                        <td class="text-start ps-4 fw-bold" data-i18n="s7_r1">📊 Revenue</td>
+                                        <td class="text-green fw-bold">RM 3,150</td>
+                                        <td class="text-green fw-bold" style="background: rgba(76, 175, 80, 0.05);">RM 5,250</td>
+                                        <td class="text-green fw-bold">RM 7,350</td>
+                                    </tr>
+                                    <tr class="reveal-step" data-step-group="3">
+                                        <td class="text-start ps-4 text-white" data-i18n="s7_r2">👟 Operation & marketing cost (30%)</td>
+                                        <td>945</td>
+                                        <td style="background: rgba(76, 175, 80, 0.05); position: relative;">1575 <span class="golden-arrow">➤</span></td>
+                                        <td>2205</td>
+                                    </tr>
+                                    <tr class="reveal-step" data-step-group="4">
+                                        <td class="text-start ps-4 text-white" data-i18n="s7_r3">🏢 Rental/utilities (150-300)</td>
+                                        <td>300</td>
+                                        <td style="background: rgba(76, 175, 80, 0.05);">300</td>
+                                        <td>300</td>
+                                    </tr>
+                                    <tr class="reveal-step" data-step-group="5">
+                                        <td class="text-start ps-4 text-white" data-i18n="s7_r4">✅ SST(6%)</td>
+                                        <td>189</td>
+                                        <td style="background: rgba(76, 175, 80, 0.05);">315</td>
+                                        <td>441</td>
+                                    </tr>
+                                    <tr class="reveal-step" data-step-group="6" style="border-bottom: 2px solid rgba(255,255,255,0.2);">
+                                        <td class="text-start ps-4 text-danger fw-bold" data-i18n="s7_r5">🔴 Total cost</td>
+                                        <td class="text-danger fw-bold">1,434</td>
+                                        <td class="text-danger fw-bold" style="background: rgba(76, 175, 80, 0.05);">2,190</td>
+                                        <td class="text-danger fw-bold">2,946</td>
+                                    </tr>
+                                    <tr class="reveal-step" data-step-group="7">
+                                        <td class="text-start ps-4 text-green fw-bold py-4" data-i18n="s7_r6">💰 Profit for cost deduction<br><span class="text-white" style="font-size: 1.1rem;">(Profit for Bosses)</span></td>
+                                        <td class="text-green fw-bold fs-4">RM 1,716</td>
+                                        <td class="text-green fw-bold fs-4" style="background: rgba(76, 175, 80, 0.15); box-shadow: inset 0 0 15px rgba(76,175,80,0.3);">RM 3,060</td>
+                                        <td class="text-green fw-bold fs-4">RM 4,404</td>
+                                    </tr>
+                                    <tr class="reveal-step" data-step-group="8">
+                                        <td class="text-start ps-4 fw-bold" data-i18n="s7_r7">📈 ROI</td>
+                                        <td class="fw-bold">12.43%</td>
+                                        <td class="fw-bold" style="background: rgba(76, 175, 80, 0.05);">22.17%</td>
+                                        <td class="fw-bold">31.991%</td>
+                                    </tr>
+                                    <tr class="reveal-step" data-step-group="9">
+                                        <td class="text-start ps-4 fw-bold" data-i18n="s7_r8">⏳ Break Even (months)</td>
+                                        <td class="fw-bold">8 to 9</td>
+                                        <td class="fw-bold" style="background: rgba(76, 175, 80, 0.05);">4 to 5</td>
+                                        <td class="fw-bold">3 to 4</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ========== SLIDE 8: PACKAGE B PROJECTION ========== -->
+            <section class="pitch-section" style="background-image: url('BG_1.jpg');">
+                <div class="content-box" style="background: rgba(5, 11, 8, 0.6); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);"></div>
+                <div class="slide-content-scaler">
+                    <div class="container text-center d-flex flex-column justify-content-center pt-2">
+                        <h2 class="text-green display-5" style="margin-top: 60px; margin-bottom: 20px;" data-i18n="s8_title">FINANCIAL PROJECTION - PARTNER PACKAGE B</h2>
+                        <h3 class="highlight mb-5 text-center" data-i18n="s8_sub">INITIAL INVESTMENT: RM 12,800</h3>
+                        
+                        <div class="row g-4">
+                            <div class="col-4">
+                                <div class="glass-card reveal-step text-start p-4" data-step-group="1">
+                                    <h4 class="text-white text-center bg-dark bg-opacity-50 py-3 rounded mb-4 border border-secondary" data-i18n="s8_c1_h">CONSERVATIVE SCENARIO</h4>
+                                    <div class="stat-row"><span class="fs-4 text-white" data-i18n="s8_washes">Daily/Monthly Washes</span><span class="fs-4 text-white fw-bold">15/450</span></div>
+                                    <div class="stat-row"><span class="fs-4 text-white" data-i18n="s8_sales">Estimated Sales</span><span class="fs-3 text-green fw-bold">RM 3,150</span></div>
+                                    <div class="stat-row mt-3"><span class="fs-5 text-danger" data-i18n="s8_op">Op & Mkt (20%)</span><span class="fs-5 text-danger fw-bold">630</span></div>
+                                    <div class="stat-row"><span class="fs-5 text-danger" data-i18n="s8_rental">Rental & Util (150-300)</span><span class="fs-5 text-danger fw-bold">300</span></div>
+                                    <div class="stat-row"><span class="fs-5 text-danger" data-i18n="s8_sst">SST (6%)</span><span class="fs-5 text-danger fw-bold">189</span></div>
+                                    <div class="stat-row border-top border-danger border-2 mt-2 pt-3"><span class="fs-4 text-white" data-i18n="s8_total">Total Cost</span><span class="fs-4 text-danger fw-bold">1119</span></div>
+                                    <div class="stat-row mt-3"><span class="fs-4 fw-bold" data-i18n="s8_net">NET PROFIT</span><span class="fs-2 text-green fw-bold">2031</span></div>
+                                    <div class="stat-row mt-3 border-0"><span class="fs-5 text-white" data-i18n="s8_roi">ROI</span><span class="fs-5 text-white fw-bold">15.86%</span></div>
+                                    <div class="stat-row border-0 pt-0"><span class="fs-5 text-white" data-i18n="s8_be">Break Even (months)</span><span class="fs-5 text-white fw-bold">6 to 7</span></div>
+                                </div>
+                            </div>
+                            <div class="col-4">
+                                <div class="glass-card reveal-step text-start p-4 card-glow" data-step-group="2">
+                                    <h4 class="text-white text-center bg-success bg-opacity-25 py-3 rounded mb-4 border border-success" data-i18n="s8_c2_h">STANDARD SCENARIO</h4>
+                                    <div class="stat-row"><span class="fs-4 text-white" data-i18n="s8_washes">Daily/Monthly Washes</span><span class="fs-4 text-white fw-bold">25/750</span></div>
+                                    <div class="stat-row"><span class="fs-4 text-white" data-i18n="s8_sales">Estimated Sales</span><span class="fs-3 text-green fw-bold">RM 5,250</span></div>
+                                    <div class="stat-row mt-3"><span class="fs-5 text-danger" data-i18n="s8_op">Op & Mkt (20%)</span><span class="fs-5 text-danger fw-bold">1575</span></div>
+                                    <div class="stat-row"><span class="fs-5 text-danger" data-i18n="s8_rental">Rental & Util (150-300)</span><span class="fs-5 text-danger fw-bold">300</span></div>
+                                    <div class="stat-row"><span class="fs-5 text-danger" data-i18n="s8_sst">SST (6%)</span><span class="fs-5 text-danger fw-bold">315</span></div>
+                                    <div class="stat-row border-top border-danger border-2 mt-2 pt-3"><span class="fs-4 text-white" data-i18n="s8_total">Total Cost</span><span class="fs-4 text-danger fw-bold">2190</span></div>
+                                    <div class="stat-row mt-3"><span class="fs-4 fw-bold" data-i18n="s8_net">NET PROFIT</span><span class="fs-2 text-green fw-bold">3060</span></div>
+                                    <div class="stat-row mt-3 border-0"><span class="fs-5 text-white" data-i18n="s8_roi">ROI</span><span class="fs-5 text-white fw-bold">23.90%</span></div>
+                                    <div class="stat-row border-0 pt-0"><span class="fs-5 text-white" data-i18n="s8_be">Break Even (months)</span><span class="fs-5 text-white fw-bold">4 to 5</span></div>
+                                </div>
+                            </div>
+                            <div class="col-4">
+                                <div class="glass-card reveal-step text-start p-4" data-step-group="3">
+                                    <h4 class="text-white text-center bg-dark bg-opacity-50 py-3 rounded mb-4 border border-secondary" data-i18n="s8_c3_h">OPTIMISTIC SCENARIO</h4>
+                                    <div class="stat-row"><span class="fs-4 text-white" data-i18n="s8_washes">Daily/Monthly Washes</span><span class="fs-4 text-white fw-bold">35/1050</span></div>
+                                    <div class="stat-row"><span class="fs-4 text-white" data-i18n="s8_sales">Estimated Sales</span><span class="fs-3 text-green fw-bold">RM 7,350</span></div>
+                                    <div class="stat-row mt-3"><span class="fs-5 text-danger" data-i18n="s8_op">Op & Mkt (20%)</span><span class="fs-5 text-danger fw-bold">2205</span></div>
+                                    <div class="stat-row"><span class="fs-5 text-danger" data-i18n="s8_rental">Rental & Util (150-300)</span><span class="fs-5 text-danger fw-bold">300</span></div>
+                                    <div class="stat-row"><span class="fs-5 text-danger" data-i18n="s8_sst">SST (6%)</span><span class="fs-5 text-danger fw-bold">441</span></div>
+                                    <div class="stat-row border-top border-danger border-2 mt-2 pt-3"><span class="fs-4 text-white" data-i18n="s8_total">Total Cost</span><span class="fs-4 text-danger fw-bold">2946</span></div>
+                                    <div class="stat-row mt-3"><span class="fs-4 fw-bold" data-i18n="s8_net">NET PROFIT</span><span class="fs-2 text-green fw-bold">4404</span></div>
+                                    <div class="stat-row mt-3 border-0"><span class="fs-5 text-white" data-i18n="s8_roi">ROI</span><span class="fs-5 text-white fw-bold">34.40%</span></div>
+                                    <div class="stat-row border-0 pt-0"><span class="fs-5 text-white" data-i18n="s8_be">Break Even (months)</span><span class="fs-5 text-white fw-bold">3</span></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ========== SLIDE 9: PROMO PACKAGE A ========== -->
+            <section class="pitch-section" style="background-image: url('BG_8.jpg');">
+                <div class="content-box"></div>
+                <div class="slide-content-scaler">
+                    <div class="container text-center">
+                        <h2 class="text-green display-4" style="margin-bottom: 50px;" data-i18n="s9_title">PROMO PACKAGE A</h2>
+                        <div class="row align-items-center g-4">
+                            <div class="col-3 text-center reveal-step" data-step-group="1">
+                                <img src="Machine.png" alt="1 Unit" class="img-fluid" style="max-height: 450px; filter: drop-shadow(0 0 15px rgba(255,255,255,0.1));">
+                                <h3 class="mt-4 text-white" data-i18n="s9_1unit">1 unit</h3>
+                                <h2 class="text-green fw-bold">RM 13,800</h2>
+                            </div>
+                            <div class="col-6">
+                                <div class="green-glass-card text-start reveal-step" data-step-group="2">
+                                    <h3 class="text-white mb-3" data-i18n="s9_sub">Services Provided:</h3>
+                                    <h5 class="text-warning mb-4" data-i18n="s9_opex">Package & OPEX inclusive (30%)</h5>
+                                    <ul class="fs-4 ps-4 text-white list-unstyled" style="line-height: 1.8;">
+                                        <li><span class="text-green me-2">1.</span> <span data-i18n="s9_l1">FREE Software & Hardware integration</span></li>
+                                        <li><span class="text-green me-2">2.</span> <span data-i18n="s9_l2">FREE Payment Gateway Integration</span></li>
+                                        <li><span class="text-green me-2">3.</span> <span data-i18n="s9_l3">Portal & Apps support with CRM program</span></li>
+                                        <li><span class="text-green me-2">4.</span> <span data-i18n="s9_l4">FREE Insurance coverage</span></li>
+                                        <li><span class="text-green me-2">5.</span> <span data-i18n="s9_l5">FREE 3 years Brand Licensing</span></li>
+                                        <li><span class="text-green me-2">6.</span> <span data-i18n="s9_l6">FREE 3 years Warranty</span></li>
+                                        <li><span class="text-green me-2">7.</span> <span data-i18n="s9_l7">FREE 3 years maintenance</span></li>
+                                        <li><span class="text-green me-2">8.</span> <span data-i18n="s9_l8">FREE Raw Materials (sanitizer & house perfume)</span></li>
+                                        <li><span class="text-green me-2">9.</span> <span data-i18n="s9_l9">FREE Social media Viral Support</span></li>
+                                        <li><span class="text-green me-2">10.</span> <span data-i18n="s9_l10">FREE marketing support</span></li>
+                                        <li><span class="text-green me-2">11.</span> <span data-i18n="s9_l11">Customer Care support</span></li>
+                                        <li><span class="text-green me-2">12.</span> <span data-i18n="s9_l12">FREE location scouting</span></li>
+                                        <li><span class="text-green me-2">13.</span> <span data-i18n="s9_l13">FREE weekly operation support</span></li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="col-3 text-center reveal-step" data-step-group="3">
+                                <div class="d-flex justify-content-center gap-3">
+                                    <img src="Machine.png" alt="Unit 1" class="img-fluid" style="max-height: 450px; filter: drop-shadow(0 0 15px rgba(255,255,255,0.1));">
+                                    <img src="Machine.png" alt="Unit 2" class="img-fluid" style="max-height: 450px; filter: drop-shadow(0 0 15px rgba(255,255,255,0.1));">
+                                </div>
+                                <h3 class="mt-4 text-white" data-i18n="s9_2unit">2 units & Above</h3>
+                                <h2 class="text-green fw-bold">RM 13,000</h2>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ========== SLIDE 10: PROMO PACKAGE B ========== -->
+            <section class="pitch-section" style="background-image: url('BG_8.jpg');">
+                <div class="content-box"></div>
+                <div class="slide-content-scaler">
+                    <div class="container text-center">
+                        <h2 class="text-green display-4" style="margin-bottom: 50px;" data-i18n="s10_title">PROMO PACKAGE B</h2>
+                        <div class="row align-items-center g-4">
+                            <div class="col-3 text-center reveal-step" data-step-group="1">
+                                <img src="Machine.png" alt="1 Unit" class="img-fluid" style="max-height: 450px; filter: drop-shadow(0 0 15px rgba(255,255,255,0.1));">
+                                <h3 class="mt-4 text-white" data-i18n="s10_1unit">1 unit</h3>
+                                <h2 class="text-green fw-bold">RM 12,800</h2>
+                            </div>
+                            <div class="col-6">
+                                <div class="green-glass-card text-start reveal-step" data-step-group="2">
+                                    <h3 class="text-white mb-3" data-i18n="s10_sub">Services Provided:</h3>
+                                    <h5 class="text-warning mb-4" data-i18n="s10_opex">Package & OPEX inclusive (20%)</h5>
+                                    <ul class="fs-4 ps-4 text-white list-unstyled" style="line-height: 1.8;">
+                                        <li><span class="text-green me-2">1.</span> <span data-i18n="s10_l1">FREE Software & Hardware integration</span></li>
+                                        <li><span class="text-green me-2">2.</span> <span data-i18n="s10_l2">FREE Payment Gateway Integration</span></li>
+                                        <li><span class="text-green me-2">3.</span> <span data-i18n="s10_l3">Portal & Apps support with CRM program</span></li>
+                                        <li><span class="text-green me-2">4.</span> <span data-i18n="s10_l4">FREE Insurance coverage</span></li>
+                                        <li><span class="text-green me-2">5.</span> <span data-i18n="s10_l5">FREE 3 years Brand Licensing</span></li>
+                                        <li><span class="text-green me-2">6.</span> <span data-i18n="s10_l6">FREE 1 year Warranty</span></li>
+                                        <li><span class="text-green me-2">7.</span> <span data-i18n="s10_l7">FREE 1 year maintenance (within Klang Valley. Additional charges may apply for locations outside Klang Valley)</span></li>
+                                        <li><span class="text-green me-2">8.</span> <span data-i18n="s10_l8">FREE Raw Materials (sanitizer & house perfume)</span></li>
+                                        <li><span class="text-green me-2">9.</span> <span data-i18n="s10_l9">FREE Social media Viral Support</span></li>
+                                        <li><span class="text-green me-2">10.</span> <span data-i18n="s10_l10">FREE marketing support</span></li>
+                                        <li><span class="text-green me-2">11.</span> <span data-i18n="s10_l11">Customer Care support</span></li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="col-3 text-center reveal-step" data-step-group="3">
+                                <div class="d-flex justify-content-center gap-3">
+                                    <img src="Machine.png" alt="Unit 1" class="img-fluid" style="max-height: 450px; filter: drop-shadow(0 0 15px rgba(255,255,255,0.1));">
+                                    <img src="Machine.png" alt="Unit 2" class="img-fluid" style="max-height: 450px; filter: drop-shadow(0 0 15px rgba(255,255,255,0.1));">
+                                </div>
+                                <h3 class="mt-4 text-white" data-i18n="s10_2unit">2 units & Above</h3>
+                                <h2 class="text-green fw-bold">RM 12,500</h2>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ========== SLIDE 11: SYSTEM CONFIG ========== -->
+            <section class="pitch-section" style="background-image: url('BG_1.jpg');">
+                <div class="content-box" style="background: rgba(5, 11, 8, 0.6); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);"></div>
+                <div class="slide-content-scaler">
+                    <div class="container text-center d-flex flex-column justify-content-center pt-2">
+                        <h2 class="text-white display-3 fw-bold mb-5 pb-4 text-center" data-i18n="s11_title">HELMETKU SYSTEM CONFIGURATION</h2>
+                        
+                        <div class="row g-4 justify-content-center">
+                            <div class="col-4"><div class="glass-card text-center p-4 reveal-step" data-step-group="1"><h3 class="text-warning mb-2" data-i18n="s11_t1">Brand Licensing</h3><p class="fs-4 mb-0 text-white" data-i18n="s11_d1">3 Years FREE</p></div></div>
+                            <div class="col-4"><div class="glass-card text-center p-4 reveal-step" data-step-group="2"><h3 class="text-warning mb-2" data-i18n="s11_t2">Warranty & Maintenance</h3><p class="fs-4 mb-0 text-white" data-i18n="s11_d2">3 Years FREE</p></div></div>
+                            <div class="col-4"><div class="glass-card text-center p-4 reveal-step" data-step-group="3"><h3 class="text-warning mb-2" data-i18n="s11_t3">Social Media Ads</h3><p class="fs-4 mb-0 text-white" data-i18n="s11_d3">FREE Official Content</p></div></div>
+                            <div class="col-4"><div class="glass-card text-center p-4 reveal-step" data-step-group="4"><h3 class="text-warning mb-2" data-i18n="s11_t4">DuitNow Payment</h3><p class="fs-4 mb-0 text-white" data-i18n="s11_d4">FREE</p></div></div>
+                            <div class="col-4"><div class="glass-card text-center p-4 reveal-step" data-step-group="5"><h3 class="text-warning mb-2" data-i18n="s11_t5">Location Scouting</h3><p class="fs-4 mb-0 text-white" data-i18n="s11_d5">FREE</p></div></div>
+                            <div class="col-4"><div class="glass-card text-center p-4 reveal-step" data-step-group="6"><h3 class="text-warning mb-2" data-i18n="s11_t6">Insurance Coverage</h3><p class="fs-4 mb-0 text-white" data-i18n="s11_d6">FREE</p></div></div>
+                            <div class="col-4"><div class="glass-card text-center p-4 reveal-step" data-step-group="7"><h3 class="text-warning mb-2" data-i18n="s11_t7">Sanitizer & Fragrance</h3><p class="fs-4 mb-0 text-white" data-i18n="s11_d7">FREE</p></div></div>
+                            <div class="col-4"><div class="glass-card text-center p-4 reveal-step" data-step-group="8"><h3 class="text-warning mb-2" data-i18n="s11_t8">Customer Member App</h3><p class="fs-4 mb-0 text-white" data-i18n="s11_d8">FREE</p></div></div>
+                            <div class="col-4"><div class="glass-card text-center p-4 reveal-step" data-step-group="9"><h3 class="text-warning mb-2" data-i18n="s11_t9">Partner Backend System</h3><p class="fs-4 mb-0 text-white" data-i18n="s11_d9">FREE</p></div></div>
+                            <div class="col-5"><div class="glass-card text-center p-4 reveal-step" data-step-group="10"><h3 class="text-warning mb-2" data-i18n="s11_t10">Continuous Marketing</h3><p class="fs-4 mb-0 text-white" data-i18n="s11_d10">FREE</p></div></div>
+                            <div class="col-5"><div class="glass-card text-center p-4 reveal-step" data-step-group="11"><h3 class="text-warning mb-2" data-i18n="s11_t11">Weekly Operations Support</h3><p class="fs-4 mb-0 text-white" data-i18n="s11_d11">FREE</p></div></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ========== SLIDE 12: CONTACT US ========== -->
+            <section class="pitch-section" id="section-12" style="background-color: #fff; background-image: linear-gradient(115deg, #ffffff 40%, #208b4b 40%, #208b4b 55%, #156c38 55%, #156c38 100%);">
+                <div class="slide-content-scaler" style="overflow: visible;">
+                    <div style="width: 1920px; height: 1080px; position: relative; overflow: hidden;">
+                        <!-- Jerry 照片 -->
+                        <img src="Jer.png" alt="Jerry Ooi" id="s12-jer" style="position: absolute; left: 0; bottom: 0; height: 80%; z-index: 10; filter: drop-shadow(5px 5px 15px rgba(0,0,0,0.5)); opacity: 0; transform: translateX(-100%); transition: all 0.8s cubic-bezier(0.25, 1, 0.5, 1);">
+                        <!-- Jacky 照片 -->
+                        <img src="Jac.png" alt="Jacky Chan" id="s12-jac" style="position: absolute; right: 0; bottom: 0; height: 80%; z-index: 10; filter: drop-shadow(5px 5px 15px rgba(0,0,0,0.5)); opacity: 0; transform: translateX(100%); transition: all 0.8s cubic-bezier(0.25, 1, 0.5, 1);">
+                        
+                        <!-- Logo + 标题 -->
+                        <div class="reveal-step" data-step-group="2" style="position: absolute; top: 22%; left: 50%; transform: translateX(-50%); width: 100%; text-align: center; z-index: 20;">
+                            <img src="Logo.png" alt="Logo" style="max-height: 150px; margin-bottom: 10px; display: block; margin-left: auto; margin-right: auto;">
+                            <h1 class="fw-bold" style="font-size: 5rem; color: #fff; text-shadow: 4px 4px 15px rgba(0,0,0,0.8); line-height: 1.2;" data-i18n="s12_title">JOIN US, <br> CREATE THE FUTURE <br> TOGETHER!</h1>
+                        </div>
+                        
+                        <!-- Jerry 联系信息 -->
+                        <div class="reveal-step" data-step-group="3" style="position: absolute; left: 18%; bottom: 12%; z-index: 30; color: #fff;">
+                            <div class="d-flex align-items-center gap-3">
+                                <div style="background: rgba(0,0,0,0.6); padding: 12px; border-radius: 50%;">
+                                    <svg width="30" height="30" fill="#fff" viewBox="0 0 16 16"><path d="M3.654 1.328a.678.678 0 0 0-1.015-.063L1.605 2.3c-.483.484-.661 1.169-.45 1.77a17.568 17.568 0 0 0 4.168 6.608 17.569 17.569 0 0 0 6.608 4.168c.601.211 1.286.033 1.77-.45l1.034-1.034a.678.678 0 0 0-.063-1.015l-2.307-1.794a.678.678 0 0 0-.58-.122l-2.19.547a1.745 1.745 0 0 1-1.657-.459L5.482 8.062a1.745 1.745 0 0 1-.46-1.657l.548-2.19a.678.678 0 0 0-.122-.58L3.654 1.328z"/></svg>
+                                </div>
+                                <div>
+                                    <h2 class="m-0 fw-bold" style="font-size: 2.8rem; text-shadow: 2px 2px 8px #000;">Jerry Ooi</h2>
+                                    <h3 class="m-0" style="font-size: 2rem; text-shadow: 2px 2px 8px #000; color: #eee;">+6012-388 5013</h3>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Jacky 联系信息 -->
+                        <div class="reveal-step" data-step-group="3" style="position: absolute; right: 18%; bottom: 12%; z-index: 30; color: #fff; text-align: right;">
+                            <div class="d-flex align-items-center gap-3 flex-row-reverse">
+                                <div style="background: rgba(0,0,0,0.6); padding: 12px; border-radius: 50%;">
+                                    <svg width="30" height="30" fill="#fff" viewBox="0 0 16 16"><path d="M3.654 1.328a.678.678 0 0 0-1.015-.063L1.605 2.3c-.483.484-.661 1.169-.45 1.77a17.568 17.568 0 0 0 4.168 6.608 17.569 17.569 0 0 0 6.608 4.168c.601.211 1.286.033 1.77-.45l1.034-1.034a.678.678 0 0 0-.063-1.015l-2.307-1.794a.678.678 0 0 0-.58-.122l-2.19.547a1.745 1.745 0 0 1-1.657-.459L5.482 8.062a1.745 1.745 0 0 1-.46-1.657l.548-2.19a.678.678 0 0 0-.122-.58L3.654 1.328z"/></svg>
+                                </div>
+                                <div>
+                                    <h2 class="m-0 fw-bold" style="font-size: 2.8rem; text-shadow: 2px 2px 8px #000;">Jacky Chan</h2>
+                                    <h3 class="m-0" style="font-size: 2rem; text-shadow: 2px 2px 8px #000; color: #eee;">+6016-796 0044</h3>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+        </div> 
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // 翻译字典
+        const translations = {
+            en: {
+                rotate_title: "Please rotate your device", rotate_sub: "For the best presentation experience.",
+                s1_title: "AUTOMATIC HELMET CLEANING MACHINE", s1_sub: "A High-Frequency, Cash-Flow, and Scalable Offline Automation Service",
+                s1_plan: "PROJECT FINANCING PLAN", s1_private: "Private Roadshow - Sophisticated Investors Only",
+                s2_title: "MACHINE SPECIFICATIONS", s2_lbl1: '21.5" HD Touch Screen', s2_lbl2: "Helmet Chambers",
+                s2_c1: "Screen", s2_d1: "21.5-inch HD touch screen", s2_c2: "Sterilization Method", s2_d2: "High-temperature steam, ozone, UV",
+                s2_c3: "Cleaning Chambers", s2_d3: "Single / Dual", s2_c4: "Payment Methods", s2_d4: "Banknote / Coin / Card / Token / QR code",
+                s2_c5: "IoT Management Platform", s2_d5: "PC, Mobile", s2_c6: "Languages", s2_d6: "Chinese / English / Customizable",
+                s2_c7: "Input Power", s2_d7: "110V~240v 50/60HZ", s2_c8: "Rated Power", s2_d8: "Dual: 2500W | Single: 1400W",
+                s2_c9: "Net Weight", s2_d9: "Dual: 118kg | Single: 107kg", s2_c10: "Fragrance", s2_d10: "6 fragrance options",
+                s2_c11: "Product Dimensions", s2_d11: "56 x 65 x 197cm",
+                s3_title: "OVER <span class='highlight'>16,700,000</span> <br> REGISTERED MOTORCYCLES IN MALAYSIA",
+                s3_desc1: "The ever-growing number of motorcyclists represents our massive potential customer base! Demand remains high daily, regardless of the dry or rainy season.",
+                s3_desc2: "Motorcyclists are actively seeking professional solutions to sanitize, sterilize, and dry their helmets!",
+                s3_pain: "REAL-WORLD PAIN POINTS:",
+                s3_p1: "Helmets remain damp for long periods with persistent odors", s3_p2: "High bacterial growth, but users find manual washing tedious",
+                s3_p3: "Lack of professional equipment and time for proper air-drying at home", s3_p4: "Delivery riders and commuters have to reuse sweaty helmets throughout the day",
+                s4_title: "GENTLE CLEAN, ODOR-FREE, LONG-LASTING FRESHNESS",
+                s4_h1: "Conventional Wash", s4_h2: "ASPECT", s4_h3: "Machine Cleaning",
+                s4_r1_c1: "Soaking, Rubbing, High-pressure", s4_r1_c2: "Method", s4_r1_c3: "High-temperature steam, Ozone disinfection, UV",
+                s4_r2_c1: "EPS foam damage, Liner deformation", s4_r2_c2: "Damage", s4_r2_c3: "Non-damaging cleaning, Structural integrity",
+                s4_r3_c1: "Residual bacteria / odors", s4_r3_c2: "Sterilization", s4_r3_c3: "High-efficiency Sterilization, odor source elimination",
+                s4_r4_c1: "Natural drying / Slow", s4_r4_c2: "Drying", s4_r4_c3: "360° rapid drying, Ready to use",
+                s4_r5_c1: "Residual bacteria and odors", s4_r5_c2: "Freshness", s4_r5_c3: "Deep clean, long-lasting antibacterial, fresh all day",
+                s5_title: "FULLY INTEGRATED BACKEND SYSTEM", s5_sub: "Real-time machine monitoring | Income tracking | Sales trend and report",
+                s5_f1_t: "Remote Monitoring", s5_f1_d: "Remote monitoring of equipment status and online/offline tracking.",
+                s5_f2_t: "Revenue Synchronization", s5_f2_d: "Real-time order revenue data synchronization and sales tracking.",
+                s5_f3_t: "Smart Advertising", s5_f3_d: "Smart advertising management for the 21.5-inch HD screen.",
+                s5_f4_t: "Smart Cleaning Mode", s5_f4_d: "Smart cleaning mode adjustment and parameter configurations.",
+                s6_title: "AUTOMATIC HELMET CLEANING MACHINE", s6_sub: "Efficient and Convenient 360° All-Around Cleaning Solution",
+                s6_f1: "💨 Fog Dry Cleaning", s6_f2: "☀️ UV Sterilization", s6_f3: "🔥 Heat Drying and Sterilization",
+                s6_i1: "🕒 5-8 Mins Done", s6_i2: "✨ Dry Wash & Sterilize", s6_i3: "📱 QR / Cashless",
+                s6_i4: "📐 Small Footprint", s6_i5: "🚫 No Water Needed", s6_i6: "⏳ 24/7 Available", s6_i7: "🔄 360° Full Coverage",
+                s7_title: "FINANCIAL PROJECTION - PARTNER PACKAGE A", s7_sub: "INITIAL INVESTMENT: RM 13,800",
+                s7_h_desc: "📈 Daily/monthly sales /<br>Average selling price",
+                s7_h_s1: "SCENARIO 1:<br>Conservative<br><span class='fs-5 text-white'>(15/450 washes)</span>",
+                s7_h_s2: "SCENARIO 2:<br>Standard<br><span class='fs-5 text-white'>(25/750 washes)</span>",
+                s7_h_s3: "SCENARIO 3:<br>Optimal<br><span class='fs-5 text-white'>(35/1050 washes)</span>",
+                s7_r1: "📊 Revenue", s7_r2: "👟 Operation & marketing cost (30%)", s7_r3: "🏢 Rental/utilities (150-300)",
+                s7_r4: "✅ SST(6%)", s7_r5: "🔴 Total cost", s7_r6: "💰 Profit for cost deduction<br><span class='fs-5 text-white'>(Profit for Bosses)</span>",
+                s7_r7: "📈 ROI", s7_r8: "⏳ Break Even (months)",
+                s8_title: "FINANCIAL PROJECTION - PARTNER PACKAGE B", s8_sub: "INITIAL INVESTMENT: RM 12,800",
+                s8_c1_h: "CONSERVATIVE SCENARIO", s8_c2_h: "STANDARD SCENARIO", s8_c3_h: "OPTIMISTIC SCENARIO",
+                s8_washes: "Daily/Monthly Washes", s8_sales: "Estimated Sales", s8_op: "Op & Mkt (20%)",
+                s8_rental: "Rental & Util (150-300)", s8_sst: "SST (6%)", s8_total: "Total Cost", s8_net: "NET PROFIT",
+                s8_roi: "ROI", s8_be: "Break Even (months)",
+                s9_title: "PROMO PACKAGE A", s9_1unit: "1 unit", s9_2unit: "2 units & Above", s9_sub: "Services Provided:",
+                s9_opex: "Package & OPEX inclusive (30%)",
+                s9_l1: "FREE Software & Hardware integration", s9_l2: "FREE Payment Gateway Integration",
+                s9_l3: "Portal & Apps support with CRM program", s9_l4: "FREE Insurance coverage",
+                s9_l5: "FREE 3 years Brand Licensing", s9_l6: "FREE 3 years Warranty", s9_l7: "FREE 3 years maintenance",
+                s9_l8: "FREE Raw Materials (sanitizer & house perfume)", s9_l9: "FREE Social media Viral Support",
+                s9_l10: "FREE marketing support", s9_l11: "Customer Care support", s9_l12: "FREE location scouting",
+                s9_l13: "FREE weekly operation support",
+                s10_title: "PROMO PACKAGE B", s10_1unit: "1 unit", s10_2unit: "2 units & Above", s10_sub: "Services Provided:",
+                s10_opex: "Package & OPEX inclusive (20%)",
+                s10_l1: "FREE Software & Hardware integration", s10_l2: "FREE Payment Gateway Integration",
+                s10_l3: "Portal & Apps support with CRM program", s10_l4: "FREE Insurance coverage",
+                s10_l5: "FREE 3 years Brand Licensing", s10_l6: "FREE 1 year Warranty",
+                s10_l7: "FREE 1 year maintenance (within Klang Valley. Additional charges may apply for locations outside Klang Valley)",
+                s10_l8: "FREE Raw Materials (sanitizer & house perfume)", s10_l9: "FREE Social media Viral Support",
+                s10_l10: "FREE marketing support", s10_l11: "Customer Care support",
+                s11_title: "HELMETKU SYSTEM CONFIGURATION",
+                s11_t1: "Brand Licensing", s11_d1: "3 Years FREE", s11_t2: "Warranty & Maintenance", s11_d2: "3 Years FREE",
+                s11_t3: "Social Media Ads", s11_d3: "FREE Official Content", s11_t4: "DuitNow Payment", s11_d4: "FREE",
+                s11_t5: "Location Scouting", s11_d5: "FREE", s11_t6: "Insurance Coverage", s11_d6: "FREE",
+                s11_t7: "Sanitizer & Fragrance", s11_d7: "FREE", s11_t8: "Customer Member App", s11_d8: "FREE",
+                s11_t9: "Partner Backend System", s11_d9: "FREE", s11_t10: "Continuous Marketing", s11_d10: "FREE",
+                s11_t11: "Weekly Operations Support", s11_d11: "FREE",
+                s12_title: "JOIN US, <br> CREATE THE FUTURE <br> TOGETHER!",
+                idx_0: "<span>01</span> Cover", idx_1: "<span>02</span> Machine Specs", idx_2: "<span>03</span> Market Pain Points",
+                idx_3: "<span>04</span> Our Solution", idx_4: "<span>05</span> Digital System", idx_5: "<span>06</span> Product Features",
+                idx_6: "<span>07</span> Package A Projection", idx_7: "<span>08</span> Package B Projection",
+                idx_8: "<span>09</span> Promo Package A", idx_9: "<span>10</span> Promo Package B",
+                idx_10: "<span>11</span> System Config", idx_11: "<span>12</span> Contact Us"
+            },
+            zh: {
+                rotate_title: "请将手机横放", rotate_sub: "以获得最佳路演观看体验。",
+                s1_title: "自动头盔清洗机", s1_sub: "一个高频、现金流、可复制的线下自动化服务",
+                s1_plan: "项目融资计划", s1_private: "私人路演 - 仅限熟练投资者",
+                s2_title: "机器配置与参数", s2_lbl1: "21.5英寸高清触摸屏", s2_lbl2: "头盔清洁舱",
+                s2_c1: "屏幕", s2_d1: "21.5英寸高清触摸屏", s2_c2: "杀菌方式", s2_d2: "高温蒸汽、臭氧、UV 紫外线",
+                s2_c3: "清洁舱数", s2_d3: "单舱 / 双舱", s2_c4: "支付方式", s2_d4: "纸币 / 硬币 / 刷卡 / 代币 / 二维码",
+                s2_c5: "IoT 管理平台", s2_d5: "电脑 PC，手机端", s2_c6: "语言", s2_d6: "中文 / 英文 / 支持定制",
+                s2_c7: "输入电压", s2_d7: "110V~240v 50/60HZ", s2_c8: "额定功率", s2_d8: "双舱: 2500W | 单舱: 1400W",
+                s2_c9: "产品净重", s2_d9: "双舱: 118kg | 单舱: 107kg", s2_c10: "香氛", s2_d10: "6种香氛选择",
+                s2_c11: "产品尺寸", s2_d11: "56 x 65 x 197cm",
+                s3_title: "全马注册的摩托已超过 <br> <span class='highlight'>16,700,000</span> 辆",
+                s3_desc1: "每天都在增加的摩托骑士就是我们潜在的庞大客户群！不管旱季或雨季，每日需求量极高。",
+                s3_desc2: "摩托骑士都在积极寻找着可为他们头盔消毒，杀菌，烘干的专业解决方案！",
+                s3_pain: "现实的痛点：",
+                s3_p1: "1）摩托头盔长期潮湿，异味重", s3_p2: "2）细菌多，但用户懒得自己洗",
+                s3_p3: "3）家里没设备，也没时间晾干", s3_p4: "4）外送员/通勤族一整天重复使用满是汗水的头盔",
+                s4_title: "无损洁净，杀菌除味，持久清新", s4_h1: "传统水洗", s4_h2: "对比项", s4_h3: "机器清洁",
+                s4_r1_c1: "浸泡、揉搓、高压直冲", s4_r1_c2: "清洁方式", s4_r1_c3: "高温蒸汽 / 臭氧消毒 / 紫外线杀菌",
+                s4_r2_c1: "损伤 EPS 缓冲层、内衬变形", s4_r2_c2: "对头盔的伤害", s4_r2_c3: "无损清洁，结构完好",
+                s4_r3_c1: "难以彻底清除细菌与异味", s4_r3_c2: "杀菌效果", s4_r3_c3: "高效杀菌去除异味",
+                s4_r4_c1: "自然晾晒，耗时久", s4_r4_c2: "干燥效率", s4_r4_c3: "360°烘干，即洗即用",
+                s4_r5_c1: "异味易残留，短时间内复发", s4_r5_c2: "清新效果", s4_r5_c3: "深层净化，长效抑菌，持久清新",
+                s5_title: "全功能后端支持系统", s5_sub: "实时机器监控 | 收益追踪 | 销售趋势与报表",
+                s5_f1_t: "远程状态监控", s5_f1_d: "远程监控设备状态，实时掌握机器在线/离线与故障报警。",
+                s5_f2_t: "收益实时同步", s5_f2_d: "订单收益数据实时同步，精准追踪每日/每月销售趋势。",
+                s5_f3_t: "智能广告管理", s5_f3_d: "远程智能广告投放管理，轻松更新大屏多媒体内容。",
+                s5_f4_t: "智能模式调整", s5_f4_d: "智能清洁模式调整，随时通过云端修改机器运营参数。",
+                s6_title: "自动头盔清洗机", s6_sub: "高效便捷的 360° 全方位清洁方案",
+                s6_f1: "💨 烟雾干洗", s6_f2: "☀️ 紫外线 (UV) 杀菌", s6_f3: "🔥 高温烘干与消毒",
+                s6_i1: "🕒 5-8 分钟完成", s6_i2: "✨ 干洗+杀菌+除臭", s6_i3: "📱 QR Pay/无现金",
+                s6_i4: "📐 占地小", s6_i5: "🚫 无需用水", s6_i6: "⏳ 24小时可用", s6_i7: "🔄 360° 零死角",
+                s7_title: "财务预测 - 投资配套 A", s7_sub: "初始投资: RM 13,800",
+                s7_h_desc: "📈 每日/每月销量 /<br>平均售价",
+                s7_h_s1: "场景 1:<br>保守预估<br><span class='fs-5 text-white'>(15/450 次洗涤)</span>",
+                s7_h_s2: "场景 2:<br>标准预估<br><span class='fs-5 text-white'>(25/750 次洗涤)</span>",
+                s7_h_s3: "场景 3:<br>理想预估<br><span class='fs-5 text-white'>(35/1050 次洗涤)</span>",
+                s7_r1: "📊 营业额", s7_r2: "👟 营运与营销成本 (30%)", s7_r3: "🏢 租金/水电 (150-300)",
+                s7_r4: "✅ SST(6%)", s7_r5: "🔴 总成本", s7_r6: "💰 扣除成本后利润<br><span class='fs-5 text-white'>(机主净利)</span>",
+                s7_r7: "📈 投资回报率 (ROI)", s7_r8: "⏳ 回本期 (个月)",
+                s8_title: "财务预测 - 投资配套 B", s8_sub: "初始投资: RM 12,800",
+                s8_c1_h: "保守预估场景", s8_c2_h: "标准预估场景", s8_c3_h: "理想预估场景",
+                s8_washes: "每日/每月洗涤量", s8_sales: "预估营业额", s8_op: "营运与营销 (20%)",
+                s8_rental: "租金与水电 (150-300)", s8_sst: "SST (6%)", s8_total: "总成本", s8_net: "净利润",
+                s8_roi: "投资回报率", s8_be: "回本期 (个月)",
+                s9_title: "配套 A (全托管理)", s9_1unit: "单台", s9_2unit: "两台及以上", s9_sub: "包含服务：",
+                s9_opex: "配套包含 (30% 营运分成):",
+                s9_l1: "免费 软硬件系统整合", s9_l2: "免费 支付网关 (DuitNow) 整合",
+                s9_l3: "提供 专属后台与顾客 CRM App 支持", s9_l4: "免费 机器保险保障",
+                s9_l5: "免费 3年品牌授权 (Brand Licensing)", s9_l6: "免费 3年机器保修", s9_l7: "免费 3年上门维护",
+                s9_l8: "免费 清洗原料 (消毒液与香精)", s9_l9: "免费 社交媒体病毒式营销支持",
+                s9_l10: "免费 持续市场营销支持", s9_l11: "客服中心支援 (Customer Care)", s9_l12: "免费 机器选址服务",
+                s9_l13: "免费 每周营运指导与支持",
+                s10_title: "配套 B (自主营运)", s10_1unit: "单台", s10_2unit: "两台及以上", s10_sub: "包含服务：",
+                s10_opex: "配套包含 (20% 营运分成):",
+                s10_l1: "免费 软硬件系统整合", s10_l2: "免费 支付网关 (DuitNow) 整合",
+                s10_l3: "提供 专属后台与顾客 CRM App 支持", s10_l4: "免费 机器保险保障",
+                s10_l5: "免费 3年品牌授权 (Brand Licensing)", s10_l6: "免费 1年机器保修",
+                s10_l7: "免费 1年上门维护 (仅限巴生谷地区，跨区需附加费)", s10_l8: "免费 清洗原料 (消毒液与香精)",
+                s10_l9: "免费 社交媒体病毒式营销支持", s10_l10: "免费 持续市场营销支持", s10_l11: "客服中心支援 (Customer Care)",
+                s11_title: "HelmetKu 的系统配置：",
+                s11_t1: "品牌授权", s11_d1: "3年免费Brand Licensing", s11_t2: "保修+维护", s11_d2: "3年免费",
+                s11_t3: "Social Media 广告推广", s11_d3: "免费官方内容支持", s11_t4: "DuitNow支付系统", s11_d4: "免费",
+                s11_t5: "选址服务", s11_d5: "免费", s11_t6: "保险保障", s11_d6: "免费",
+                s11_t7: "消毒，香精原料", s11_d7: "免费", s11_t8: "顾客会员App", s11_d8: "免费",
+                s11_t9: "机主后端系统", s11_d9: "免费", s11_t10: "持续市场运营支援", s11_d10: "免费",
+                s11_t11: "每周运营支援", s11_d11: "免费",
+                s12_title: "加入我们， <br> 一起共创未来！",
+                idx_0: "<span>01</span> 封面", idx_1: "<span>02</span> 机器配置", idx_2: "<span>03</span> 市场痛点",
+                idx_3: "<span>04</span> 我们的方案", idx_4: "<span>05</span> 后端系统", idx_5: "<span>06</span> 产品特点",
+                idx_6: "<span>07</span> 投资配套 A", idx_7: "<span>08</span> 投资配套 B",
+                idx_8: "<span>09</span> 配套 A 详情", idx_9: "<span>10</span> 配套 B 详情",
+                idx_10: "<span>11</span> 系统配置", idx_11: "<span>12</span> 联系我们"
+            },
+            ms: {
+                rotate_title: "Sila pusingkan peranti anda", rotate_sub: "Untuk pengalaman paparan yang terbaik.",
+                s1_title: "MESIN PENCUCI TOPI KELEDAR AUTOMATIK", s1_sub: "Perkhidmatan Automasi Luar Talian Berfrekuensi Tinggi, Aliran Tunai & Boleh Dikembangkan",
+                s1_plan: "PELAN PEMBIAYAAN PROJEK", s1_private: "Jerayawara Peribadi - Hanya Untuk Pelabur Sofistikated",
+                s2_title: "SPESIFIKASI MESIN", s2_lbl1: 'Skrin Sentuh HD 21.5"', s2_lbl2: "Ruang Cucian",
+                s2_c1: "Skrin", s2_d1: "Skrin sentuh HD 21.5 inci", s2_c2: "Kaedah Pensterilan", s2_d2: "Stim suhu tinggi, ozon, UV",
+                s2_c3: "Ruang Cucian", s2_d3: "Tunggal / Berkambar", s2_c4: "Kaedah Pembayaran", s2_d4: "Wang Kertas / Syiling / Kad / Kod QR",
+                s2_c5: "Pengurusan IoT", s2_d5: "PC, Mudah Alih", s2_c6: "Bahasa", s2_d6: "Cina / Inggeris / Boleh Disesuaikan",
+                s2_c7: "Kuasa Input", s2_d7: "110V~240v 50/60HZ", s2_c8: "Kuasa Berkadar", s2_d8: "Dual: 2500W | Single: 1400W",
+                s2_c9: "Berat Bersih", s2_d9: "Dual: 118kg | Single: 107kg", s2_c10: "Pewangi", s2_d10: "6 pilihan haruman",
+                s2_c11: "Dimensi Produk", s2_d11: "56 x 65 x 197cm",
+                s3_title: "LEBIH DARIPADA <span class='highlight'>16,700,000</span> <br> MOTOSIKAL BERDAFTAR DI MALAYSIA",
+                s3_desc1: "Jumlah penunggang motosikal yang semakin bertambah mewakili pangkalan pelanggan berpotensi besar kita! Permintaan kekal tinggi setiap hari, tanpa mengira musim kemarau atau hujan.",
+                s3_desc2: "Penunggang motosikal aktif mencari penyelesaian profesional untuk mensanitasi, mensteril, dan mengeringkan topi keledar mereka!",
+                s3_pain: "MASALAH DUNIA SEBENAR:",
+                s3_p1: "Topi keledar kekal lembap untuk tempoh yang lama dengan bau yang berterusan", s3_p2: "Pertumbuhan bakteria tinggi, tetapi pengguna malas mencuci secara manual",
+                s3_p3: "Kekurangan peralatan profesional dan masa untuk pengeringan udara yang sempurna di rumah", s3_p4: "Penghantar makanan dan pengguna komuter terpaksa menggunakan semula topi keledar yang berpeluh sepanjang hari",
+                s4_title: "CUCIAN LEMBUT, BEBAS BAU, KESEGARAN BERPANJANGAN",
+                s4_h1: "Cucian Tradisional", s4_h2: "ASPEK", s4_h3: "Cucian Mesin",
+                s4_r1_c1: "Rendaman, Sentalan, Tekanan Tinggi", s4_r1_c2: "Kaedah", s4_r1_c3: "Stim Suhu Tinggi, Pensterilan Ozon, UV",
+                s4_r2_c1: "Kerosakan busa EPS, Perubahan bentuk pelapik", s4_r2_c2: "Kerosakan", s4_r2_c3: "Cucian tanpa rosak, Struktur terpelihara",
+                s4_r3_c1: "Bakteria & bau tertinggal", s4_r3_c2: "Pensterilan", s4_r3_c3: "Pensterilan sangat berkesan, hapus punca bau",
+                s4_r4_c1: "Kering semula jadi / Lambat", s4_r4_c2: "Pengeringan", s4_r4_c3: "Keringan pantas 360°, Sedia digunakan",
+                s4_r5_c1: "Kuman & bau tertinggal, cepat berbau semula", s4_r5_c2: "Kesegaran", s4_r5_c3: "Cucian mendalam, anti-bakteria berpanjangan",
+                s5_title: "SISTEM SOKONGAN BACKEND BERSEPADU", s5_sub: "Pemantauan mesin masa nyata | Penjejakan pendapatan | Laporan trend jualan",
+                s5_f1_t: "Pemantauan Jarak Jauh", s5_f1_d: "Pemantauan status peralatan dari jauh, dalam talian/luar talian.",
+                s5_f2_t: "Penyegerakan Hasil", s5_f2_d: "Penyegerakan data hasil pesanan masa nyata dan jejak jualan.",
+                s5_f3_t: "Pengiklanan Pintar", s5_f3_d: "Pengurusan pengiklanan pintar untuk skrin HD 21.5 inci.",
+                s5_f4_t: "Pelarasan Mod Pintar", s5_f4_d: "Pelarasan mod pembersihan pintar dan konfigurasi parameter.",
+                s6_title: "MESIN PENCUCI TOPI KELEDAR AUTOMATIK", s6_sub: "Penyelesaian Pembersihan Menyeluruh 360° yang Cekap dan Mudah",
+                s6_f1: "💨 Cucian Kering Kabus", s6_f2: "☀️ Pensterilan UV", s6_f3: "🔥 Pengeringan & Pensterilan Haba",
+                s6_i1: "🕒 Siap dalam 5-8 Minit", s6_i2: "✨ Cuci Kering & Steril", s6_i3: "📱 Bayaran QR / Tanpa Tunai",
+                s6_i4: "📐 Ruang Kecil", s6_i5: "🚫 Tidak Perlu Air", s6_i6: "⏳ Tersedia 24/7", s6_i7: "🔄 Liputan Penuh 360°",
+                s7_title: "UNJURAN KEWANGAN - PAKEJ RAKAN KONGSI A", s7_sub: "PELABURAN AWAL: RM 13,800",
+                s7_h_desc: "📈 Jualan harian/bulanan /<br>Purata harga jualan",
+                s7_h_s1: "SENARIO 1:<br>Konservatif<br><span class='fs-5 text-white'>(15/450 cucian)</span>",
+                s7_h_s2: "SENARIO 2:<br>Standard<br><span class='fs-5 text-white'>(25/750 cucian)</span>",
+                s7_h_s3: "SENARIO 3:<br>Optimum<br><span class='fs-5 text-white'>(35/1050 cucian)</span>",
+                s7_r1: "📊 Hasil", s7_r2: "👟 Kos operasi & pemasaran (30%)", s7_r3: "🏢 Sewa/utiliti (150-300)",
+                s7_r4: "✅ SST(6%)", s7_r5: "🔴 Jumlah kos", s7_r6: "💰 Keuntungan selepas tolakan kos<br><span class='fs-5 text-white'>(Untung Bersih)</span>",
+                s7_r7: "📈 ROI", s7_r8: "⏳ Pulang Modal (bulan)",
+                s8_title: "UNJURAN KEWANGAN - PAKEJ RAKAN KONGSI B", s8_sub: "PELABURAN AWAL: RM 12,800",
+                s8_c1_h: "SENARIO KONSERVATIF", s8_c2_h: "SENARIO STANDARD", s8_c3_h: "SENARIO OPTIMUM",
+                s8_washes: "Cucian Harian/Bulanan", s8_sales: "Anggaran Hasil", s8_op: "Operasi & Pemasaran (20%)",
+                s8_rental: "Sewa & Utiliti (150-300)", s8_sst: "SST (6%)", s8_total: "Jumlah Kos", s8_net: "UNTUNG BERSIH",
+                s8_roi: "ROI", s8_be: "Pulang Modal (bulan)",
+                s9_title: "PAKEJ PROMO A", s9_1unit: "1 unit", s9_2unit: "2 unit & Ke atas", s9_sub: "Perkhidmatan Disediakan:",
+                s9_opex: "Pakej & OPEX termasuk (30%):",
+                s9_l1: "PERCUMA Integrasi Perisian & Perkakasan", s9_l2: "PERCUMA Integrasi Gerbang Pembayaran",
+                s9_l3: "Sokongan Portal & Aplikasi dengan program CRM", s9_l4: "PERCUMA Perlindungan Insurans",
+                s9_l5: "PERCUMA Pelesenan Jenama 3 tahun", s9_l6: "PERCUMA Waranti 3 tahun", s9_l7: "PERCUMA Penyelenggaraan 3 tahun",
+                s9_l8: "PERCUMA Bahan Mentah (sanitizer & pewangi)", s9_l9: "PERCUMA Sokongan Viral Media Sosial",
+                s9_l10: "PERCUMA Sokongan Pemasaran", s9_l11: "Sokongan Pusat Khidmat Pelanggan",
+                s9_l12: "PERCUMA Pencarian Lokasi Mesin", s9_l13: "PERCUMA Sokongan operasi mingguan",
+                s10_title: "PROMO PAKEJ B", s10_1unit: "1 unit", s10_2unit: "2 unit & Ke atas", s10_sub: "Perkhidmatan Disediakan:",
+                s10_opex: "Pakej & OPEX termasuk (20%):",
+                s10_l1: "PERCUMA Integrasi Perisian & Perkakasan", s10_l2: "PERCUMA Integrasi Gerbang Pembayaran",
+                s10_l3: "Sokongan Portal & Aplikasi dengan program CRM", s10_l4: "PERCUMA Perlindungan Insurans",
+                s10_l5: "PERCUMA Pelesenan Jenama 3 tahun", s10_l6: "PERCUMA Waranti 1 tahun",
+                s10_l7: "PERCUMA Penyelenggaraan 1 tahun (Lembah Klang. Caj tambahan untuk luar Lembah Klang)",
+                s10_l8: "PERCUMA Bahan Mentah (sanitizer & pewangi)", s10_l9: "PERCUMA Sokongan Viral Media Sosial",
+                s10_l10: "PERCUMA Sokongan Pemasaran", s10_l11: "Sokongan Pusat Khidmat Pelanggan",
+                s11_title: "KONFIGURASI SISTEM HELMETKU",
+                s11_t1: "Pelesenan Jenama", s11_d1: "3 Tahun PERCUMA", s11_t2: "Waranti & Penyelenggaraan", s11_d2: "3 Tahun PERCUMA",
+                s11_t3: "Iklan Media Sosial", s11_d3: "Kandungan Rasmi PERCUMA", s11_t4: "Sistem Bayaran DuitNow", s11_d4: "PERCUMA",
+                s11_t5: "Carian Lokasi", s11_d5: "PERCUMA", s11_t6: "Perlindungan Insurans", s11_d6: "PERCUMA",
+                s11_t7: "Bahan Mentah (Sanitizer & Pewangi)", s11_d7: "PERCUMA", s11_t8: "Aplikasi Pelanggan", s11_d8: "PERCUMA",
+                s11_t9: "Sistem Backend Pemilik", s11_d9: "PERCUMA",
+                s11_t10: "Sokongan Pemasaran Berterusan", s11_d10: "PERCUMA",
+                s11_t11: "Sokongan Operasi Mingguan", s11_d11: "PERCUMA",
+                s12_title: "SERTAI KAMI, <br> CIPTA MASA DEPAN <br> BERSAMA!",
+                idx_0: "<span>01</span> Muka Depan", idx_1: "<span>02</span> Spesifikasi Mesin", idx_2: "<span>03</span> Masalah Pasaran",
+                idx_3: "<span>04</span> Penyelesaian Kami", idx_4: "<span>05</span> Sistem Digital", idx_5: "<span>06</span> Ciri-ciri Produk",
+                idx_6: "<span>07</span> Unjuran Pakej A", idx_7: "<span>08</span> Unjuran Pakej B",
+                idx_8: "<span>09</span> Promo Pakej A", idx_9: "<span>10</span> Promo Pakej B",
+                idx_10: "<span>11</span> Sistem Konfigurasi", idx_11: "<span>12</span> Hubungi Kami"
+            }
+        };
+
+        let currentIndex = 0;
+        let sections;
+        let lastActionTime = 0;
+
+        // ===== 缩放引擎 =====
+        function applyScale() {
+            const scaleX = window.innerWidth / 1920;
+            const scaleY = window.innerHeight / 1080;
+            const baseScale = Math.min(scaleX, scaleY);
+
+            const isIPad = /iPad|Macintosh/.test(navigator.userAgent) && 'ontouchend' in document;
+
+            let finalScale;
+            if (isIPad) {
+                finalScale = baseScale * 0.98;
+            } else if (window.innerWidth > 1024) {
+                finalScale = baseScale * 1.08;
+            } else {
+                finalScale = baseScale * 1.10;
+            }
+
+            document.querySelectorAll('.slide-content-scaler').forEach(el => {
+                el.style.transform = `translate(-50%, -50%) scale(${finalScale})`;
+            });
+        }
+
+        window.addEventListener('resize', applyScale);
+        window.addEventListener('orientationchange', () => { setTimeout(applyScale, 100); });
+
+        // ===== 语言切换 =====
+        function setLang(lang) {
+            document.querySelectorAll('.lang-btn, .lang-btn-prompt').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll(`button[onclick="setLang('${lang}')"]`).forEach(btn => btn.classList.add('active'));
+
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (translations[lang] && translations[lang][key]) {
+                    el.innerHTML = translations[lang][key];
+                }
+            });
+            localStorage.setItem('licensingLang', lang);
+        }
+
+        function toggleIndex() { document.getElementById('page-index-overlay').classList.toggle('active'); }
+
+        function jumpTo(index) {
+            currentIndex = index;
+            updateSlidePosition();
+            sections[currentIndex].querySelectorAll('.reveal-step').forEach(el => el.classList.add('active'));
+            
+            // 第12页人物照片特殊处理
+            if (currentIndex === 11) {
+                const jer = document.getElementById('s12-jer');
+                const jac = document.getElementById('s12-jac');
+                if (jer) { jer.style.opacity = '1'; jer.style.transform = 'translateX(0)'; }
+                if (jac) { jac.style.opacity = '1'; jac.style.transform = 'translateX(0)'; }
+            }
+            
+            document.getElementById('page-index-overlay').classList.remove('active');
+        }
+
+        function updateSlidePosition() {
+            document.getElementById('slides-wrapper').style.transform = `translateX(-${currentIndex * 100}vw)`;
+        }
+
+        function goNext() {
+            const now = Date.now();
+            if (now - lastActionTime < 300) return;
+            lastActionTime = now;
+
+            const currentSection = sections[currentIndex];
+            const hiddenSteps = currentSection.querySelectorAll('.reveal-step:not(.active)');
+
+            if (hiddenSteps.length > 0) {
+                const group = hiddenSteps[0].getAttribute('data-step-group');
+                if (group) {
+                    currentSection.querySelectorAll(`.reveal-step[data-step-group="${group}"]`).forEach(el => el.classList.add('active'));
+                    
+                    // 第12页人物照片控制
+                    if (currentIndex === 11 && group === '1') {
+                        setTimeout(() => {
+                            const jer = document.getElementById('s12-jer');
+                            const jac = document.getElementById('s12-jac');
+                            if (jer) { jer.style.opacity = '1'; jer.style.transform = 'translateX(0)'; }
+                            if (jac) { jac.style.opacity = '1'; jac.style.transform = 'translateX(0)'; }
+                        }, 100);
+                    }
+                } else {
+                    hiddenSteps[0].classList.add('active');
+                }
+            } else if (currentIndex < sections.length - 1) {
+                currentIndex++;
+                updateSlidePosition();
+            }
+        }
+
+        function goPrev() {
+            const now = Date.now();
+            if (now - lastActionTime < 300) return;
+            lastActionTime = now;
+
+            const currentSection = sections[currentIndex];
+            const activeSteps = currentSection.querySelectorAll('.reveal-step.active');
+
+            if (activeSteps.length > 0) {
+                const group = activeSteps[activeSteps.length - 1].getAttribute('data-step-group');
+                if (group) {
+                    currentSection.querySelectorAll(`.reveal-step.active[data-step-group="${group}"]`).forEach(el => el.classList.remove('active'));
+                    
+                    // 第12页人物照片控制
+                    if (currentIndex === 11 && group === '1') {
+                        const jer = document.getElementById('s12-jer');
+                        const jac = document.getElementById('s12-jac');
+                        if (jer) { jer.style.opacity = '0'; jer.style.transform = 'translateX(-100%)'; }
+                        if (jac) { jac.style.opacity = '0'; jac.style.transform = 'translateX(100%)'; }
+                    }
+                } else {
+                    activeSteps[activeSteps.length - 1].classList.remove('active');
+                }
+            } else if (currentIndex > 0) {
+                currentIndex--;
+                updateSlidePosition();
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            sections = document.querySelectorAll('.pitch-section');
+            applyScale();
+            
+            // 隐藏加载画面
+            setTimeout(() => {
+                document.getElementById('loading-screen').style.display = 'none';
+            }, 500);
+
+            setLang(localStorage.getItem('licensingLang') || 'en');
+
+            window.addEventListener('keydown', (e) => {
+                if (e.key === 'f' || e.key === 'F') { !document.fullscreenElement ? document.documentElement.requestFullscreen().catch(()=>{}) : document.exitFullscreen(); }
+                if (['ArrowRight', 'ArrowDown', 'Space'].includes(e.code) || e.key === 'ArrowRight' || e.key === 'ArrowDown') { e.preventDefault(); goNext(); }
+                else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') { e.preventDefault(); goPrev(); }
+            });
+
+            window.addEventListener('click', (e) => {
+                if (e.target.closest('#page-index-btn') || e.target.closest('#page-index-overlay') || e.target.closest('button')) return;
+                e.clientX > window.innerWidth / 2 ? goNext() : goPrev();
+            });
+
+            let touchX = 0, touchY = 0;
+            window.addEventListener('touchstart', (e) => { touchX = e.changedTouches[0].screenX; touchY = e.changedTouches[0].screenY; });
+            window.addEventListener('touchend', (e) => {
+                if (e.target.closest('#page-index-btn') || e.target.closest('#page-index-overlay') || e.target.closest('button')) return;
+                let diffX = e.changedTouches[0].screenX - touchX, diffY = e.changedTouches[0].screenY - touchY;
+                if (Math.abs(diffY) > 50) return;
+                if (diffX < -50) goNext(); else if (diffX > 50) goPrev();
+            });
+        });
+    </script>
+</body>
+</html>
