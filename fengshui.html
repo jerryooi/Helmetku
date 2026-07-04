@@ -1,0 +1,1132 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>风水罗盘 · 九宫飞星 · 八宅 · 二十四山</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            min-height: 100vh;
+            background: linear-gradient(145deg, #1a1a2e 0%, #2b2b2b 100%);
+            font-family: 'Segoe UI', 'PingFang SC', Roboto, 'Microsoft YaHei', sans-serif;
+            padding: 16px 14px 40px;
+            color: #f0e6d0;
+        }
+        .header {
+            text-align: center;
+            padding: 30px 10px 16px;
+        }
+        .header h1 {
+            font-size: 28px;
+            letter-spacing: 8px;
+            color: #f7d49e;
+            font-weight: 400;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+        }
+        .header .sub {
+            font-size: 13px;
+            color: #8a9a90;
+            letter-spacing: 3px;
+            margin-top: 4px;
+        }
+        .header .time {
+            font-size: 13px;
+            color: #7a6e58;
+            margin-top: 6px;
+            letter-spacing: 1px;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 6px;
+            justify-content: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            position: sticky;
+            top: 8px;
+            z-index: 100;
+            background: rgba(26,26,46,0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            padding: 8px 12px;
+            border-radius: 40px;
+            border: 1px solid rgba(255,215,150,0.08);
+        }
+        .tab {
+            padding: 8px 18px;
+            border-radius: 30px;
+            border: 1px solid rgba(255,215,150,0.1);
+            background: rgba(255,255,255,0.03);
+            color: #b8a98a;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+            letter-spacing: 2px;
+            white-space: nowrap;
+        }
+        .tab.active {
+            background: rgba(247,212,158,0.12);
+            border-color: rgba(247,212,158,0.25);
+            color: #f7d49e;
+        }
+        .tab:hover { background: rgba(255,255,255,0.06); }
+
+        .panel { display: none; }
+        .panel.active { display: block; }
+
+        .section-title {
+            font-size: 13px;
+            color: #8f8068;
+            letter-spacing: 3px;
+            margin: 14px 0 8px;
+            border-left: 3px solid rgba(247,212,158,0.3);
+            padding-left: 10px;
+        }
+        .card-box {
+            background: rgba(255,255,255,0.04);
+            border-radius: 24px;
+            padding: 18px 16px 20px;
+            border: 1px solid rgba(255,215,150,0.06);
+            margin-bottom: 14px;
+        }
+
+        /* ===== 九宫飞星 ===== */
+        .fx-year {
+            text-align: center;
+            color: #eacc9a;
+            font-size: 18px;
+            letter-spacing: 4px;
+            margin-bottom: 12px;
+        }
+        .fx-grid {
+            display: grid;
+            grid-template-columns: repeat(3,1fr);
+            gap: 6px;
+            max-width: 320px;
+            margin: 0 auto 14px;
+        }
+        .fx-grid .fx-cell {
+            aspect-ratio: 1;
+            background: rgba(255,255,255,0.04);
+            border-radius: 14px;
+            padding: 8px 4px;
+            text-align: center;
+            border: 1px solid rgba(255,215,150,0.06);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+        .fx-cell .fx-num { font-size: 26px; font-weight: 700; color: #fadc9f; }
+        .fx-cell .fx-name { font-size: 12px; color: #d4c5a6; margin-top: 1px; }
+        .fx-cell .fx-dir { font-size: 10px; color: #8a9a90; }
+        .fx-cell .fx-luck { font-size: 11px; margin-top: 2px; }
+        .fx-cell.fx-good { border-color: rgba(100,200,150,0.2); background: rgba(100,200,150,0.05); }
+        .fx-cell.fx-bad { border-color: rgba(220,100,100,0.2); background: rgba(220,100,100,0.05); }
+        .fx-cell.fx-wealth { border-color: rgba(247,212,158,0.3); background: rgba(247,212,158,0.08); box-shadow: 0 0 16px rgba(247,212,158,0.06); }
+        .fx-cell.fx-romance { border-color: rgba(220,150,200,0.25); background: rgba(220,150,200,0.06); }
+        .fx-cell.fx-sick { border-color: rgba(120,120,120,0.25); background: rgba(120,120,120,0.06); }
+
+        .fx-legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px 14px;
+            justify-content: center;
+            margin-bottom: 12px;
+        }
+        .fx-legend .leg-item { font-size: 12px; color: #b8a98a; display: flex; align-items: center; gap: 4px; }
+        .fx-legend .leg-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+
+        .fx-summary {
+            padding: 12px 14px;
+            background: rgba(255,215,150,0.04);
+            border-radius: 16px;
+            border: 1px solid rgba(255,200,150,0.06);
+        }
+        .fx-summary .s-title { font-size: 13px; color: #f7d49e; letter-spacing: 2px; margin-bottom: 6px; }
+        .fx-summary .s-text { font-size: 14px; color: #d4c5a6; line-height: 1.8; }
+        .fx-summary .s-text b { color: #fadc9f; }
+
+        .fx-month-grid {
+            display: grid;
+            grid-template-columns: repeat(3,1fr);
+            gap: 5px;
+            max-width: 300px;
+            margin: 8px auto;
+        }
+        .fx-month-grid .fxm-cell {
+            background: rgba(255,255,255,0.03);
+            border-radius: 10px;
+            padding: 6px;
+            text-align: center;
+        }
+        .fxm-cell .fxm-num { font-size: 18px; font-weight: 600; color: #d4c5a6; }
+        .fxm-cell .fxm-name { font-size: 10px; color: #8a9a90; }
+        .fx-month-label { text-align: center; color: #7a6e58; font-size: 12px; margin-top: 6px; }
+
+        /* ===== 八宅 ===== */
+        .bz-input-row {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 16px;
+        }
+        .bz-input-row input, .bz-input-row select {
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,215,150,0.12);
+            padding: 10px 14px;
+            border-radius: 30px;
+            color: #f0e6d0;
+            font-size: 15px;
+            outline: none;
+            min-width: 90px;
+        }
+        .bz-input-row input:focus, .bz-input-row select:focus { border-color: #f7d49e; }
+        .bz-input-row button {
+            background: radial-gradient(circle at 30% 20%, #a8d4c0, #70a898);
+            border: none;
+            padding: 10px 24px;
+            border-radius: 30px;
+            color: #1a1a2e;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 3px 0 #4a7a6a;
+            transition: all 0.1s;
+            letter-spacing: 2px;
+        }
+        .bz-input-row button:active { transform: translateY(3px); box-shadow: 0 0 0 #4a7a6a; }
+
+        .bz-ming-display { text-align: center; margin-bottom: 14px; }
+        .bz-ming-display .bz-ming { font-size: 26px; color: #fadc9f; font-weight: 500; letter-spacing: 4px; }
+        .bz-ming-display .bz-type { font-size: 15px; color: #d4c5a6; margin-top: 4px; }
+        .bz-ming-display .bz-advice { font-size: 13px; color: #b8a98a; margin-top: 6px; }
+
+        .bz-dir-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 6px;
+        }
+        .bz-dir-grid .bz-item {
+            background: rgba(255,255,255,0.03);
+            border-radius: 12px;
+            padding: 10px 12px;
+            text-align: center;
+            border: 1px solid rgba(255,215,150,0.06);
+        }
+        .bz-item.bz-good { border-color: rgba(100,200,150,0.18); background: rgba(100,200,150,0.04); }
+        .bz-item.bz-bad { border-color: rgba(220,100,100,0.18); background: rgba(220,100,100,0.04); }
+        .bz-item .bz-d { font-size: 17px; font-weight: 500; color: #f0dcc0; }
+        .bz-item .bz-l { font-size: 12px; color: #b8a98a; margin-top: 2px; }
+        .bz-item .bz-m { font-size: 13px; color: #d4c5a6; margin-top: 4px; }
+
+        .bz-bagua {
+            margin-top: 12px;
+        }
+        .bz-bagua .bg-title { font-size: 13px; color: #8f8068; text-align: center; letter-spacing: 2px; margin-bottom: 8px; }
+        .bz-bagua .bg-grid {
+            display: grid;
+            grid-template-columns: repeat(3,1fr);
+            gap: 4px;
+            max-width: 220px;
+            margin: 0 auto;
+        }
+        .bg-grid .bg-cell {
+            aspect-ratio: 1;
+            background: rgba(255,255,255,0.03);
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            border: 1px solid rgba(255,215,150,0.06);
+        }
+        .bg-cell.bg-c { background: rgba(247,212,158,0.05); border-color: rgba(247,212,158,0.12); }
+        .bg-cell .bg-d { font-size: 10px; color: #7a6e58; }
+        .bg-cell .bg-g { font-size: 15px; font-weight: 500; color: #f0dcc0; }
+        .bg-cell .bg-t { font-size: 10px; color: #8a9a90; }
+        .bg-cell.bg-ji { border-color: rgba(100,200,150,0.15); }
+        .bg-cell.bg-x { border-color: rgba(220,100,100,0.15); }
+
+        /* ===== 二十四山 ===== */
+        .tf-period {
+            text-align: center;
+            margin-bottom: 10px;
+        }
+        .tf-period .tf-p { font-size: 20px; color: #f7d49e; letter-spacing: 4px; }
+        .tf-period .tf-d { font-size: 13px; color: #b8a98a; margin-top: 2px; }
+
+        .tf-grid {
+            display: grid;
+            grid-template-columns: repeat(8,1fr);
+            gap: 3px;
+            max-width: 340px;
+            margin: 0 auto 12px;
+        }
+        .tf-grid .tf-cell {
+            text-align: center;
+            padding: 6px 2px;
+            border-radius: 8px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,215,150,0.04);
+        }
+        .tf-cell .tf-s { font-size: 15px; font-weight: 500; color: #f0dcc0; }
+        .tf-cell .tf-w { font-size: 10px; color: #8a9a90; }
+        .tf-cell.tf-g { border-color: rgba(100,200,150,0.18); background: rgba(100,200,150,0.04); }
+        .tf-cell.tf-b { border-color: rgba(220,100,100,0.18); background: rgba(220,100,100,0.04); }
+        .tf-cell.tf-c { border-color: rgba(247,212,158,0.25); background: rgba(247,212,158,0.07); }
+
+        .tf-info {
+            padding: 12px 16px;
+            background: rgba(255,255,255,0.03);
+            border-radius: 16px;
+            margin-top: 8px;
+        }
+        .tf-info .ti-t { font-size: 14px; color: #f7d49e; letter-spacing: 2px; }
+        .tf-info .ti-d { font-size: 14px; color: #d4c5a6; line-height: 1.8; margin-top: 6px; }
+        .tf-info .ti-d b { color: #fadc9f; }
+        .tf-info .ti-d .ok { color: #a0d8b0; }
+        .tf-info .ti-d .no { color: #d8a0a0; }
+
+        .back-link {
+            text-align: center;
+            margin-top: 20px;
+            padding: 14px;
+        }
+        .back-link a {
+            color: #8a9a90;
+            text-decoration: none;
+            font-size: 14px;
+            letter-spacing: 2px;
+            border: 1px solid rgba(255,215,150,0.1);
+            padding: 10px 24px;
+            border-radius: 30px;
+            transition: all 0.2s;
+            display: inline-block;
+        }
+        .back-link a:hover { border-color: rgba(255,215,150,0.25); color: #b8a98a; }
+
+        @media (max-width:420px) {
+            .header h1 { font-size: 24px; }
+            .tab { font-size: 12px; padding: 6px 14px; }
+            .fx-grid .fx-cell { padding: 6px 2px; }
+            .fx-cell .fx-num { font-size: 22px; }
+            .tf-grid { grid-template-columns: repeat(6,1fr); gap: 2px; }
+            .tf-grid .tf-cell { padding: 4px 1px; }
+            .tf-cell .tf-s { font-size: 13px; }
+        }
+
+        /* ===== 指南针 ===== */
+        .compass-wrap {
+            display: flex; flex-direction: column; align-items: center; margin: 10px 0;
+        }
+        .compass-outer {
+            position: relative; width: 280px; height: 280px; margin: 0 auto 16px;
+            border-radius: 50%; background: rgba(255,255,255,0.04);
+            border: 2px solid rgba(255,215,150,0.15);
+            box-shadow: 0 0 40px rgba(0,0,0,0.4), inset 0 0 30px rgba(0,0,0,0.2);
+        }
+        .compass-outer .cp-ring {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            border-radius: 50%;
+        }
+        .cp-ring .cp-shan {
+            position: absolute; font-size: 12px; color: #b8a98a;
+            transform-origin: 140px 140px; left: 0; top: 0; width: 100%; height: 100%;
+            display: flex; align-items: flex-start; justify-content: center; padding-top: 8px;
+        }
+        .cp-ring .cp-shan.major { font-size: 15px; font-weight: 600; color: #f0dcc0; }
+        .cp-ring .cp-shan.good { color: #a0d8b0; }
+        .cp-ring .cp-shan.bad { color: #d8a0a0; }
+        .cp-ring .cp-shan.current { color: #f7d49e; font-weight: 700; text-shadow: 0 0 12px rgba(247,212,158,0.4); }
+
+        .compass-needle {
+            position: absolute; top: 50%; left: 50%; width: 0; height: 0;
+            transform: translate(-50%, -50%);
+            z-index: 10;
+        }
+        .compass-needle .needle {
+            position: absolute; width: 4px; height: 100px;
+            background: linear-gradient(to top, #c66 50%, #444 50%);
+            border-radius: 2px; left: -2px; top: -50px;
+            box-shadow: 0 0 8px rgba(0,0,0,0.3);
+        }
+        .compass-needle .needle-tip {
+            position: absolute; width: 12px; height: 12px;
+            background: radial-gradient(circle, #f7d49e, #c4925a);
+            border-radius: 50%; left: -6px; top: -6px;
+            box-shadow: 0 0 10px rgba(247,212,158,0.4);
+        }
+        .compass-needle .needle-south {
+            position: absolute; width: 4px; height: 60px;
+            background: #c66; left: -2px; top: 2px;
+            border-radius: 2px;
+        }
+
+        .compass-center {
+            position: absolute; top: 50%; left: 50%;
+            width: 14px; height: 14px;
+            background: #f7d49e; border-radius: 50%;
+            transform: translate(-50%, -50%); z-index: 11;
+            box-shadow: 0 0 16px rgba(247,212,158,0.3);
+        }
+
+        .cp-info {
+            text-align: center; margin-bottom: 12px;
+        }
+        .cp-info .cp-degree {
+            font-size: 36px; font-weight: 700; color: #fadc9f; letter-spacing: 2px;
+        }
+        .cp-info .cp-dir-name {
+            font-size: 22px; color: #f0dcc0; margin-top: 4px; letter-spacing: 4px;
+        }
+        .cp-info .cp-shan-name {
+            font-size: 16px; color: #d4c5a6; margin-top: 2px;
+        }
+        .cp-info .cp-luck {
+            font-size: 14px; margin-top: 6px; padding: 6px 14px;
+            border-radius: 20px; display: inline-block;
+            background: rgba(255,255,255,0.04); border: 1px solid rgba(255,215,150,0.1);
+        }
+
+        .cp-status {
+            text-align: center; padding: 10px; font-size: 14px; color: #7a6e58;
+        }
+        .cp-status .cp-btn {
+            background: radial-gradient(circle at 30% 20%, #a8d4c0, #70a898);
+            border: none; padding: 10px 28px; border-radius: 30px;
+            color: #1a1a2e; font-size: 15px; font-weight: 600; cursor: pointer;
+            box-shadow: 0 3px 0 #4a7a6a; margin-top: 8px;
+        }
+        .cp-status .cp-btn:active { transform: translateY(3px); box-shadow: 0 0 0 #4a7a6a; }
+
+        .cp-dir-list {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 4px; margin-top: 10px;
+        }
+        .cp-dir-list .cpd-item {
+            background: rgba(255,255,255,0.03); border-radius: 10px;
+            padding: 6px 10px; text-align: center; font-size: 13px;
+            border: 1px solid rgba(255,215,150,0.05);
+        }
+        .cpd-item.cpd-good { border-color: rgba(100,200,150,0.15); color: #a0d8b0; }
+        .cpd-item.cpd-bad { border-color: rgba(220,100,100,0.15); color: #d8a0a0; }
+        .cpd-item.cpd-cur { border-color: rgba(247,212,158,0.25); color: #f7d49e; background: rgba(247,212,158,0.06); }
+        .cpd-item .cpd-label { font-size: 10px; color: #7a6e58; }
+
+        @media (max-width:420px) {
+            .compass-outer { width: 220px; height: 220px; }
+            .cp-ring .cp-shan { transform-origin: 110px 110px; font-size: 10px; padding-top: 6px; }
+            .cp-ring .cp-shan.major { font-size: 12px; }
+            .compass-needle .needle { height: 78px; top: -39px; }
+            .compass-needle .needle-south { height: 46px; }
+            .cp-info .cp-degree { font-size: 28px; }
+            .cp-info .cp-dir-name { font-size: 18px; }
+        }
+    </style>
+    <script src="lunar.js"></script>
+</head>
+<body>
+
+<div class="header">
+    <h1>✦ 风水罗盘 ✦</h1>
+    <div class="sub">九宫飞星 · 八宅风水 · 二十四山向</div>
+    <div class="time" id="headerTime"></div>
+</div>
+
+<div class="tabs">
+    <div class="tab active" data-tab="feixing">🔢 九宫飞星</div>
+    <div class="tab" data-tab="bazhai">🏠 八宅风水</div>
+    <div class="tab" data-tab="shanshui">🧭 二十四山</div>
+    <div class="tab" data-tab="compass">🧭 指南针</div>
+
+</div>
+
+<!-- ===== 九宫飞星 ===== -->
+<div class="panel active" id="panelFeixing">
+    <div class="fx-year" id="fxYearLabel"></div>
+    <div class="fx-grid" id="fxGrid"></div>
+
+    <div class="fx-legend">
+        <span class="leg-item"><span class="leg-dot" style="background:#f7d49e;"></span> 财位</span>
+        <span class="leg-item"><span class="leg-dot" style="background:#d896c8;"></span> 桃花/喜事</span>
+        <span class="leg-item"><span class="leg-dot" style="background:#888;"></span> 病符/五黄</span>
+        <span class="leg-item"><span class="leg-dot" style="background:#6a8;"></span> 吉星</span>
+        <span class="leg-item"><span class="leg-dot" style="background:#c66;"></span> 凶星</span>
+    </div>
+
+    <div class="fx-summary" id="fxSummary"></div>
+
+    <div class="section-title">⊙ 本月飞星</div>
+    <div class="fx-month-grid" id="fxMonthGrid"></div>
+    <div class="fx-month-label" id="fxMonthLabel"></div>
+</div>
+
+<!-- ===== 八宅风水 ===== -->
+<div class="panel" id="panelBazhai">
+    <div class="card-box">
+        <div class="bz-input-row">
+            <input type="number" id="bzYear" placeholder="出生年" min="1900" max="2100">
+            <select id="bzGender">
+                <option value="M">男</option>
+                <option value="F">女</option>
+            </select>
+            <button id="bzBtn">算命卦</button>
+        </div>
+        <div class="bz-ming-display" id="bzMingDisplay">
+            <div class="bz-ming" id="bzMing">—</div>
+            <div class="bz-type" id="bzType">请输入出生年份</div>
+            <div class="bz-advice" id="bzAdvice"></div>
+        </div>
+    </div>
+
+    <div class="section-title">⊙ 八宅吉凶方位</div>
+    <div class="bz-dir-grid" id="bzDirGrid"></div>
+
+    <div class="bz-bagua">
+        <div class="bg-title">▼ 八卦方位图（坐北朝南）</div>
+        <div class="bg-grid" id="bzBaguaGrid"></div>
+    </div>
+</div>
+
+<!-- ===== 二十四山向 ===== -->
+<div class="panel" id="panelShanshui">
+    <div class="tf-period">
+        <div class="tf-p" id="tfPeriod"></div>
+        <div class="tf-d" id="tfDetail"></div>
+    </div>
+
+    <div class="tf-grid" id="tfGrid"></div>
+
+    <div class="tf-info" id="tfYunInfo"></div>
+
+    <div class="section-title">⊙ Office选向建议（下元九运）</div>
+    <div class="tf-info" id="tfOfficeInfo"></div>
+</div>
+
+<!-- ===== 指南针 ===== -->
+<div class="panel" id="panelCompass">
+    <div class="compass-wrap">
+        <div class="cp-info">
+            <div class="cp-degree" id="cpDegree">—°</div>
+            <div class="cp-dir-name" id="cpDirName">—</div>
+            <div class="cp-shan-name" id="cpShanName">—</div>
+            <div class="cp-luck" id="cpLuck">对准方向...</div>
+        </div>
+        <div class="compass-outer" id="compassOuter">
+            <div class="cp-ring" id="cpRing"></div>
+            <div class="compass-needle" id="cpNeedle">
+                <div class="needle-tip"></div>
+                <div class="needle"></div>
+                <div class="needle-south"></div>
+            </div>
+            <div class="compass-center"></div>
+        </div>
+        <div class="cp-status" id="cpStatus">
+            <div id="cpStatusText">⏳ 加载传感器中...</div>
+            <button class="cp-btn" id="cpStartBtn" style="display:none;">启动指南针</button>
+        </div>
+    </div>
+    <div class="section-title">⊙ 当前方位风水</div>
+    <div class="cp-dir-list" id="cpDirList"></div>
+</div>
+
+<div class="back-link">
+    <a href="javascript:window.history.back();">‹ 返回主页面</a>
+</div>
+
+<script>
+(function() {
+
+    // ===== 二十四山完整数据（用于指南针） =====
+    const SHAN_24 = [
+        { shan: '子', degree: 0, dir8: '北', wx: '水', type: '正' },
+        { shan: '癸', degree: 15, dir8: '北', wx: '水', type: '偏' },
+        { shan: '丑', degree: 30, dir8: '东北', wx: '土', type: '偏' },
+        { shan: '艮', degree: 45, dir8: '东北', wx: '土', type: '正' },
+        { shan: '寅', degree: 60, dir8: '东北', wx: '木', type: '偏' },
+        { shan: '甲', degree: 75, dir8: '东', wx: '木', type: '偏' },
+        { shan: '卯', degree: 90, dir8: '东', wx: '木', type: '正' },
+        { shan: '乙', degree: 105, dir8: '东', wx: '木', type: '偏' },
+        { shan: '辰', degree: 120, dir8: '东南', wx: '土', type: '偏' },
+        { shan: '巽', degree: 135, dir8: '东南', wx: '木', type: '正' },
+        { shan: '巳', degree: 150, dir8: '东南', wx: '火', type: '偏' },
+        { shan: '丙', degree: 165, dir8: '南', wx: '火', type: '偏' },
+        { shan: '午', degree: 180, dir8: '南', wx: '火', type: '正' },
+        { shan: '丁', degree: 195, dir8: '南', wx: '火', type: '偏' },
+        { shan: '未', degree: 210, dir8: '西南', wx: '土', type: '偏' },
+        { shan: '坤', degree: 225, dir8: '西南', wx: '土', type: '正' },
+        { shan: '申', degree: 240, dir8: '西南', wx: '金', type: '偏' },
+        { shan: '庚', degree: 255, dir8: '西', wx: '金', type: '偏' },
+        { shan: '酉', degree: 270, dir8: '西', wx: '金', type: '正' },
+        { shan: '辛', degree: 285, dir8: '西', wx: '金', type: '偏' },
+        { shan: '戌', degree: 300, dir8: '西北', wx: '土', type: '偏' },
+        { shan: '乾', degree: 315, dir8: '西北', wx: '金', type: '正' },
+        { shan: '亥', degree: 330, dir8: '西北', wx: '水', type: '偏' },
+        { shan: '壬', degree: 345, dir8: '北', wx: '水', type: '偏' }
+    ];
+
+    // ===== 常量 =====
+    const ZHI = ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
+    const SHICHEN = ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
+
+    const NINE_STARS = [
+        { num: '一', name: '贪狼', color: '白', wx: '水', dir: '坎(北)', luck: '吉', meaning: '桃花·财运' },
+        { num: '二', name: '巨门', color: '黑', wx: '土', dir: '坤(西南)', luck: '凶', meaning: '病符' },
+        { num: '三', name: '禄存', color: '碧', wx: '木', dir: '震(东)', luck: '凶', meaning: '是非·争斗' },
+        { num: '四', name: '文曲', color: '绿', wx: '木', dir: '巽(东南)', luck: '吉', meaning: '文昌·学业' },
+        { num: '五', name: '廉贞', color: '黄', wx: '土', dir: '中宫', luck: '大凶', meaning: '五黄·大煞' },
+        { num: '六', name: '武曲', color: '白', wx: '金', dir: '乾(西北)', luck: '吉', meaning: '官运·事业' },
+        { num: '七', name: '破军', color: '赤', wx: '金', dir: '兑(西)', luck: '凶', meaning: '破财·损耗' },
+        { num: '八', name: '左辅', color: '白', wx: '土', dir: '艮(东北)', luck: '大吉', meaning: '正财·田宅' },
+        { num: '九', name: '右弼', color: '紫', wx: '火', dir: '离(南)', luck: '吉', meaning: '喜事·姻缘' }
+    ];
+
+    const TWENTY_FOUR_SHAN = [
+        { shan: '壬', wx: '水', dir: '北偏西北' },
+        { shan: '子', wx: '水', dir: '正北' },
+        { shan: '癸', wx: '水', dir: '北偏东北' },
+        { shan: '丑', wx: '土', dir: '东北偏北' },
+        { shan: '艮', wx: '土', dir: '正东北' },
+        { shan: '寅', wx: '木', dir: '东北偏东' },
+        { shan: '甲', wx: '木', dir: '东偏东北' },
+        { shan: '卯', wx: '木', dir: '正东' },
+        { shan: '乙', wx: '木', dir: '东偏东南' },
+        { shan: '辰', wx: '土', dir: '东南偏东' },
+        { shan: '巽', wx: '木', dir: '正东南' },
+        { shan: '巳', wx: '火', dir: '东南偏南' },
+        { shan: '丙', wx: '火', dir: '南偏东南' },
+        { shan: '午', wx: '火', dir: '正南' },
+        { shan: '丁', wx: '火', dir: '南偏西南' },
+        { shan: '未', wx: '土', dir: '西南偏南' },
+        { shan: '坤', wx: '土', dir: '正西南' },
+        { shan: '申', wx: '金', dir: '西南偏西' },
+        { shan: '庚', wx: '金', dir: '西偏西南' },
+        { shan: '酉', wx: '金', dir: '正西' },
+        { shan: '辛', wx: '金', dir: '西偏西北' },
+        { shan: '戌', wx: '土', dir: '西北偏西' },
+        { shan: '乾', wx: '金', dir: '正西北' },
+        { shan: '亥', wx: '水', dir: '西北偏北' }
+    ];
+
+    // ===== 工具 =====
+    function getLunarInfo() {
+        const l = Lunar.fromDate(new Date());
+        return {
+            y: l.getYear(),
+            month: l.getMonth(),
+            ms: l.getMonthInChinese(),
+            ds: l.getDayInChinese(),
+            hi: l.getTimeZhiIndex(),
+            ygz: l.getYearInGanZhi(),
+            mz: l.getMonthZhiIndexExact()
+        };
+    }
+
+    // ===== 九宫飞星算法 =====
+    function getFeiXingGrid(year) {
+        const base = (year - 1900) % 9;
+        let centerIdx = (10 - base) % 9;
+        if (centerIdx === 0) centerIdx = 9;
+        const starAtPos = [];
+        for (let i = 0; i < 9; i++) {
+            let idx = (centerIdx - 1 + i) % 9;
+            if (idx < 0) idx += 9;
+            starAtPos.push(idx);
+        }
+        // 显示顺序：东南(3) 南(8) 西南(1) | 东(2) 中(4) 西(6) | 东北(7) 北(0) 西北(5)
+        const displayOrder = [3, 8, 1, 2, 4, 6, 7, 0, 5];
+        return displayOrder.map(i => starAtPos[i]);
+    }
+
+    // ===== 八宅 =====
+    function calcMingGua(year, gender) {
+        const y = year % 100;
+        let num = gender === 'M' ? (100 - y) % 9 : (y - 4) % 9;
+        if (num === 0) num = 9;
+        const guaMap = ['', '坎', '坤', '震', '巽', '中', '乾', '兑', '艮', '离'];
+        let gua = guaMap[num];
+        if (num === 5) gua = gender === 'M' ? '坤' : '艮';
+        const eastWest = { '坎': '东四', '离': '东四', '震': '东四', '巽': '东四', '乾': '西四', '坤': '西四', '艮': '西四', '兑': '西四' };
+        return { num, gua, type: eastWest[gua] || '' };
+    }
+
+    const BA_ZHAI_DIRS = {
+        '坎': [
+            { dir: '东南', label: '生气 · 吉', m: '旺财事业', t: 'good' },
+            { dir: '东', label: '天医 · 吉', m: '健康贵人', t: 'good' },
+            { dir: '南', label: '延年 · 吉', m: '婚姻长寿', t: 'good' },
+            { dir: '北', label: '伏位 · 吉', m: '安定基础', t: 'good' },
+            { dir: '西南', label: '绝命 · 凶', m: '病痛破财', t: 'bad' },
+            { dir: '东北', label: '五鬼 · 凶', m: '小人意外', t: 'bad' },
+            { dir: '西', label: '六煞 · 凶', m: '口舌桃花劫', t: 'bad' },
+            { dir: '西北', label: '祸害 · 凶', m: '是非官非', t: 'bad' }
+        ],
+        '坤': [
+            { dir: '东北', label: '生气 · 吉', m: '旺财事业', t: 'good' },
+            { dir: '西', label: '天医 · 吉', m: '健康贵人', t: 'good' },
+            { dir: '西北', label: '延年 · 吉', m: '婚姻长寿', t: 'good' },
+            { dir: '西南', label: '伏位 · 吉', m: '安定基础', t: 'good' },
+            { dir: '北', label: '绝命 · 凶', m: '病痛破财', t: 'bad' },
+            { dir: '南', label: '五鬼 · 凶', m: '小人意外', t: 'bad' },
+            { dir: '东', label: '六煞 · 凶', m: '口舌桃花劫', t: 'bad' },
+            { dir: '东南', label: '祸害 · 凶', m: '是非官非', t: 'bad' }
+        ],
+        '震': [
+            { dir: '南', label: '生气 · 吉', m: '旺财事业', t: 'good' },
+            { dir: '北', label: '天医 · 吉', m: '健康贵人', t: 'good' },
+            { dir: '东南', label: '延年 · 吉', m: '婚姻长寿', t: 'good' },
+            { dir: '东', label: '伏位 · 吉', m: '安定基础', t: 'good' },
+            { dir: '西', label: '绝命 · 凶', m: '病痛破财', t: 'bad' },
+            { dir: '西北', label: '五鬼 · 凶', m: '小人意外', t: 'bad' },
+            { dir: '西南', label: '六煞 · 凶', m: '口舌桃花劫', t: 'bad' },
+            { dir: '东北', label: '祸害 · 凶', m: '是非官非', t: 'bad' }
+        ],
+        '巽': [
+            { dir: '北', label: '生气 · 吉', m: '旺财事业', t: 'good' },
+            { dir: '南', label: '天医 · 吉', m: '健康贵人', t: 'good' },
+            { dir: '东', label: '延年 · 吉', m: '婚姻长寿', t: 'good' },
+            { dir: '东南', label: '伏位 · 吉', m: '安定基础', t: 'good' },
+            { dir: '东北', label: '绝命 · 凶', m: '病痛破财', t: 'bad' },
+            { dir: '西', label: '五鬼 · 凶', m: '小人意外', t: 'bad' },
+            { dir: '西北', label: '六煞 · 凶', m: '口舌桃花劫', t: 'bad' },
+            { dir: '西南', label: '祸害 · 凶', m: '是非官非', t: 'bad' }
+        ],
+        '乾': [
+            { dir: '西', label: '生气 · 吉', m: '旺财事业', t: 'good' },
+            { dir: '东北', label: '天医 · 吉', m: '健康贵人', t: 'good' },
+            { dir: '西南', label: '延年 · 吉', m: '婚姻长寿', t: 'good' },
+            { dir: '西北', label: '伏位 · 吉', m: '安定基础', t: 'good' },
+            { dir: '南', label: '绝命 · 凶', m: '病痛破财', t: 'bad' },
+            { dir: '东', label: '五鬼 · 凶', m: '小人意外', t: 'bad' },
+            { dir: '北', label: '六煞 · 凶', m: '口舌桃花劫', t: 'bad' },
+            { dir: '东南', label: '祸害 · 凶', m: '是非官非', t: 'bad' }
+        ],
+        '兑': [
+            { dir: '西北', label: '生气 · 吉', m: '旺财事业', t: 'good' },
+            { dir: '西南', label: '天医 · 吉', m: '健康贵人', t: 'good' },
+            { dir: '东北', label: '延年 · 吉', m: '婚姻长寿', t: 'good' },
+            { dir: '西', label: '伏位 · 吉', m: '安定基础', t: 'good' },
+            { dir: '东', label: '绝命 · 凶', m: '病痛破财', t: 'bad' },
+            { dir: '南', label: '五鬼 · 凶', m: '小人意外', t: 'bad' },
+            { dir: '东南', label: '六煞 · 凶', m: '口舌桃花劫', t: 'bad' },
+            { dir: '北', label: '祸害 · 凶', m: '是非官非', t: 'bad' }
+        ],
+        '艮': [
+            { dir: '西南', label: '生气 · 吉', m: '旺财事业', t: 'good' },
+            { dir: '西北', label: '天医 · 吉', m: '健康贵人', t: 'good' },
+            { dir: '西', label: '延年 · 吉', m: '婚姻长寿', t: 'good' },
+            { dir: '东北', label: '伏位 · 吉', m: '安定基础', t: 'good' },
+            { dir: '东南', label: '绝命 · 凶', m: '病痛破财', t: 'bad' },
+            { dir: '北', label: '五鬼 · 凶', m: '小人意外', t: 'bad' },
+            { dir: '南', label: '六煞 · 凶', m: '口舌桃花劫', t: 'bad' },
+            { dir: '东', label: '祸害 · 凶', m: '是非官非', t: 'bad' }
+        ],
+        '离': [
+            { dir: '东', label: '生气 · 吉', m: '旺财事业', t: 'good' },
+            { dir: '东南', label: '天医 · 吉', m: '健康贵人', t: 'good' },
+            { dir: '北', label: '延年 · 吉', m: '婚姻长寿', t: 'good' },
+            { dir: '南', label: '伏位 · 吉', m: '安定基础', t: 'good' },
+            { dir: '西北', label: '绝命 · 凶', m: '病痛破财', t: 'bad' },
+            { dir: '西南', label: '五鬼 · 凶', m: '小人意外', t: 'bad' },
+            { dir: '东北', label: '六煞 · 凶', m: '口舌桃花劫', t: 'bad' },
+            { dir: '西', label: '祸害 · 凶', m: '是非官非', t: 'bad' }
+        ]
+    };
+
+    // ===== 三元九运 =====
+    function getYun(year) {
+        const start = 1864;
+        const idx = Math.floor((year - start) / 20);
+        if (idx < 0 || idx > 8) return null;
+        const periods = ['上元一运','上元二运','上元三运','中元四运','中元五运','中元六运','下元七运','下元八运','下元九运'];
+        const guas = ['一白坎','二黑坤','三碧震','四绿巽','五黄中','六白乾','七赤兑','八白艮','九紫离'];
+        const years = ['1864-1883','1884-1903','1904-1923','1924-1943','1944-1963','1964-1983','1984-2003','2004-2023','2024-2043'];
+        return { idx, period: periods[idx], gua: guas[idx], years: years[idx] };
+    }
+
+    // ===== 更新九宫飞星 =====
+    function updateFeiXing() {
+        const info = getLunarInfo();
+        const year = info.y;
+        const grid = getFeiXingGrid(year);
+
+        document.getElementById('fxYearLabel').textContent = year + '年 ' + info.ygz + ' · 流年紫白飞星';
+
+        const names = ['东南', '南', '西南', '东', '中', '西', '东北', '北', '西北'];
+        const dirs = ['巽', '离', '坤', '震', '中', '兑', '艮', '坎', '乾'];
+
+        let wealthDir = '', romanceDir = '', sickDir = '', wealthW = '', romanceW = '', sickW = '';
+
+        const gridEl = document.getElementById('fxGrid');
+        gridEl.innerHTML = '';
+        grid.forEach(function(starIdx, posIdx) {
+            const star = NINE_STARS[starIdx];
+            const cell = document.createElement('div');
+            cell.className = 'fx-cell';
+            if (star.luck === '吉' || star.luck === '大吉') cell.classList.add('fx-good');
+            if (star.luck === '凶' || star.luck === '大凶') cell.classList.add('fx-bad');
+            if (star.meaning.includes('桃花') || star.meaning.includes('喜事') || star.name === '右弼') cell.classList.add('fx-romance');
+            if (star.meaning.includes('财运') || star.meaning.includes('正财') || star.name === '贪狼' || star.name === '左辅') cell.classList.add('fx-wealth');
+            if (star.name === '巨门' || star.name === '廉贞') cell.classList.add('fx-sick');
+
+            if (star.name === '贪狼') { wealthDir = names[posIdx]; wealthW = dirs[posIdx]; }
+            if (star.name === '右弼') { romanceDir = names[posIdx]; romanceW = dirs[posIdx]; }
+            if (star.name === '廉贞') { sickDir = '中宫'; sickW = '中'; }
+            if (star.name === '巨门' && !sickDir.includes('中')) { sickDir = names[posIdx]; sickW = dirs[posIdx]; }
+
+            cell.innerHTML =
+                '<div class="fx-num">' + star.num + '</div>' +
+                '<div class="fx-name">' + star.name + '</div>' +
+                '<div class="fx-dir">' + names[posIdx] + '(' + dirs[posIdx] + ')</div>' +
+                '<div class="fx-luck" style="color:' + (star.luck.includes('凶') ? '#d8a0a0' : '#a0d8b0') + '">' + star.luck + '</div>';
+            gridEl.appendChild(cell);
+        });
+
+        document.getElementById('fxSummary').innerHTML =
+            '<div class="s-title">▼ 本年方位吉凶</div>' +
+            '<div class="s-text">' +
+            '💰 <b>财位</b>：' + wealthDir + '(' + wealthW + '方) 宜放招财物品<br>' +
+            '💕 <b>桃花/喜事位</b>：' + romanceDir + '(' + romanceW + '方) 宜放红色/紫色饰品<br>' +
+            '⚠️ <b>病符/五黄</b>：' + sickDir + '(' + sickW + '方) 忌动土，宜静不宜动<br>' +
+            '📌 Office座位宜面向财位或贵人位，忌背对病符方。' +
+            '</div>';
+
+        // 本月飞星
+        const month = info.month;
+        const mBase = (year - 1900 + month * 5) % 9;
+        let mCenter = (10 - mBase) % 9;
+        if (mCenter === 0) mCenter = 9;
+        const mOrder = [3, 8, 1, 2, 4, 6, 7, 0, 5];
+        const mgEl = document.getElementById('fxMonthGrid');
+        mgEl.innerHTML = '';
+        mOrder.forEach(function(pos) {
+            let idx = (mCenter - 1 + pos) % 9;
+            if (idx < 0) idx += 9;
+            const star = NINE_STARS[idx];
+            const c = document.createElement('div');
+            c.className = 'fxm-cell';
+            c.innerHTML = '<div class="fxm-num">' + star.num + '</div><div class="fxm-name">' + star.name + '</div>';
+            mgEl.appendChild(c);
+        });
+        document.getElementById('fxMonthLabel').textContent = info.ms + '月 · 流月飞星';
+    }
+
+    // ===== 更新八宅 =====
+    function updateBaZhai(year, gender) {
+        const r = calcMingGua(year, gender);
+        document.getElementById('bzMing').textContent = r.gua + '命 (' + r.num + '宫)';
+        document.getElementById('bzType').textContent = r.type + '命 · ' + year + '年出生 · ' + (gender === 'M' ? '男' : '女');
+
+        const advice = r.type === '东四'
+            ? '✅ 宜住东四宅：坐北朝南（坎宅）、坐南朝北（离宅）、坐东朝西（震宅）、坐西朝东（巽宅）'
+            : '✅ 宜住西四宅：坐西北朝东南（乾宅）、坐西南朝东北（坤宅）、坐东北朝西南（艮宅）、坐西朝东（兑宅）';
+        document.getElementById('bzAdvice').textContent = advice;
+
+        const dirs = BA_ZHAI_DIRS[r.gua];
+        if (!dirs) return;
+        const gEl = document.getElementById('bzDirGrid');
+        gEl.innerHTML = '';
+        dirs.forEach(function(d) {
+            const item = document.createElement('div');
+            item.className = 'bz-item ' + (d.t === 'good' ? 'bz-good' : 'bz-bad');
+            item.innerHTML = '<div class="bz-d">' + d.dir + '方</div><div class="bz-l">' + d.label + '</div><div class="bz-m">' + d.m + '</div>';
+            gEl.appendChild(item);
+        });
+
+        // 八卦图
+        const bgEl = document.getElementById('bzBaguaGrid');
+        bgEl.innerHTML = '';
+        const bgList = [
+            { d: '东南', g: '巽', t: '文昌', p: 0 },
+            { d: '南', g: '离', t: '喜事', p: 1 },
+            { d: '西南', g: '坤', t: '病符', p: 2 },
+            { d: '东', g: '震', t: '事业', p: 3 },
+            { d: '中', g: '中', t: '宅心', p: 4 },
+            { d: '西', g: '兑', t: '口舌', p: 5 },
+            { d: '东北', g: '艮', t: '财库', p: 6 },
+            { d: '北', g: '坎', t: '桃花', p: 7 },
+            { d: '西北', g: '乾', t: '官运', p: 8 }
+        ];
+        bgList.forEach(function(b) {
+            const c = document.createElement('div');
+            c.className = 'bg-cell';
+            if (b.p === 4) c.classList.add('bg-c');
+            const found = dirs.find(d => d.dir === b.d);
+            if (found) c.classList.add(found.t === 'good' ? 'bg-ji' : 'bg-x');
+            c.innerHTML = '<div class="bg-d">' + b.d + '</div><div class="bg-g">' + b.g + '</div><div class="bg-t">' + b.t + '</div>';
+            bgEl.appendChild(c);
+        });
+    }
+
+        // ===== 更新二十四山 =====
+    function updateShanShui() {
+        const info = getLunarInfo();
+        const year = info.y;
+        const yun = getYun(year);
+
+        if (!yun) {
+            document.getElementById('tfPeriod').textContent = '超出三元九运范围';
+            return;
+        }
+
+        document.getElementById('tfPeriod').textContent = yun.period + ' · ' + yun.gua;
+        document.getElementById('tfDetail').textContent = yun.years + (yun.idx === 8 ? ' · 当前元运' : '');
+
+        // 九运：火旺，木生火
+        const isGoodWx = (yun.idx === 8) ? ['火', '木'] : ['土', '金'];
+        const isBadWx = (yun.idx === 8) ? ['水'] : ['木'];
+
+        const gEl = document.getElementById('tfGrid');
+        gEl.innerHTML = '';
+        TWENTY_FOUR_SHAN.forEach(function(s) {
+            const c = document.createElement('div');
+            c.className = 'tf-cell';
+            const good = isGoodWx.includes(s.wx);
+            const bad = isBadWx.includes(s.wx);
+            if (good) c.classList.add('tf-g');
+            if (bad) c.classList.add('tf-b');
+            if (s.shan === '丙' || s.shan === '午' || s.shan === '丁' || s.shan === '巽' || s.shan === '艮' || s.shan === '坤' || s.shan === '乾') c.classList.add('tf-c');
+            c.innerHTML = '<div class="tf-s">' + s.shan + '</div><div class="tf-w">' + s.wx + '</div>';
+            gEl.appendChild(c);
+        });
+
+        document.getElementById('tfYunInfo').innerHTML =
+            '<div class="ti-t">▼ ' + yun.period + ' (' + yun.years + ') 气运特点</div>' +
+            '<div class="ti-d">' +
+            (yun.idx === 8 ? '🔥 下元九紫离运（2024-2043），<b>火旺当令</b>。<br>' +
+            '• 大利南方（丙午丁），火木相生之方（东、东南）亦吉。<br>' +
+            '• 北方水位（壬子癸）受火耗，不宜动土。<br>' +
+            '• 宜在南方放红色/紫色/三角形饰品催旺运势。' : '') +
+            '</div>';
+
+        document.getElementById('tfOfficeInfo').innerHTML =
+            '<div class="ti-t">▼ 看Office/租房选向建议</div>' +
+            '<div class="ti-d">' +
+            (yun.idx === 8 ?
+            '✅ <span class="ok">坐北朝南（午山子向）</span> — 最旺，南方开阔为佳<br>' +
+            '✅ <span class="ok">坐西朝东（卯山酉向）</span> — 旺文昌事业<br>' +
+            '✅ <span class="ok">坐西南朝东北（寅山申向）</span> — 旺财<br>' +
+            '⚠️ <span class="no">避免大门在正北（壬子癸）</span> — 五黄煞方<br>' +
+            '🏢 Office前方宜开阔明亮，左方(青龙)宜高于右方(白虎)' : '') +
+            '</div>';
+    }
+
+    // ===== 指南针 =====
+    function getShanByDegree(deg) {
+        deg = ((deg % 360) + 360) % 360;
+        for (let i = 0; i < SHAN_24.length - 1; i++) {
+            const mid = (SHAN_24[i].degree + SHAN_24[i+1].degree) / 2;
+            if (deg < mid) return SHAN_24[i];
+        }
+        return SHAN_24[SHAN_24.length - 1];
+    }
+
+    function get8Dir(deg) {
+        const dirs = ['北','东北','东','东南','南','西南','西','西北'];
+        const idx = Math.round(((deg + 360) % 360) / 45) % 8;
+        return dirs[idx];
+    }
+
+    function buildCompassRing() {
+        const ring = document.getElementById('cpRing');
+        ring.innerHTML = '';
+        SHAN_24.forEach(function(s) {
+            const el = document.createElement('div');
+            el.className = 'cp-shan';
+            if (['子','午','卯','酉','艮','巽','坤','乾'].includes(s.shan)) el.classList.add('major');
+            el.textContent = s.shan;
+            el.style.transform = 'rotate(' + s.degree + 'deg)';
+            el.dataset.shan = s.shan;
+            ring.appendChild(el);
+        });
+    }
+
+    let compassActive = false;
+
+    function handleOrientation(event) {
+        let heading = null;
+        if (event.webkitCompassHeading !== undefined) {
+            heading = event.webkitCompassHeading;
+        } else if (event.alpha !== null) {
+            heading = 360 - event.alpha;
+        }
+        if (heading === null) return;
+        updateCompass(heading);
+    }
+
+    function updateCompass(deg) {
+        deg = ((deg % 360) + 360) % 360;
+        const needle = document.getElementById('cpNeedle');
+        needle.style.transform = 'translate(-50%, -50%) rotate(' + deg + 'deg)';
+
+        const shan = getShanByDegree(deg);
+        const dir8 = get8Dir(deg);
+
+        document.getElementById('cpDegree').textContent = Math.round(deg) + '°';
+        document.getElementById('cpDirName').textContent = dir8 + '方';
+        document.getElementById('cpShanName').textContent = shan.shan + '山 (' + shan.dir8 + ') · ' + shan.wx + '性';
+
+        const info = getLunarInfo();
+        const yun = getYun(info.y);
+        const isGood = (yun && yun.idx === 8) ? (shan.wx === '火' || shan.wx === '木') : false;
+        const isBad = (yun && yun.idx === 8) ? (shan.wx === '水') : false;
+
+        let luckText = '', luckClass = '';
+        if (isGood) { luckText = '✅ 吉方 · 旺财旺运'; luckClass = 'color:#a0d8b0;border-color:rgba(100,200,150,0.2)'; }
+        else if (isBad) { luckText = '⚠️ 凶方 · 宜静不宜动'; luckClass = 'color:#d8a0a0;border-color:rgba(220,100,100,0.2)'; }
+        else { luckText = '➖ 平方 · 无大吉凶'; luckClass = 'color:#b8a98a;border-color:rgba(255,215,150,0.08)'; }
+
+        const luckEl = document.getElementById('cpLuck');
+        luckEl.textContent = luckText;
+        luckEl.style.cssText = luckClass;
+
+        document.querySelectorAll('#cpRing .cp-shan').forEach(function(el) {
+            el.classList.remove('good', 'bad', 'current');
+            const s = el.dataset.shan;
+            if (s === shan.shan) el.classList.add('current');
+            const sData = SHAN_24.find(function(x) { return x.shan === s; });
+            if (sData) {
+                if ((yun && yun.idx === 8) && (sData.wx === '火' || sData.wx === '木')) el.classList.add('good');
+                if ((yun && yun.idx === 8) && sData.wx === '水') el.classList.add('bad');
+            }
+        });
+
+        const listEl = document.getElementById('cpDirList');
+        listEl.innerHTML = '';
+        const allDirs = ['北','东北','东','东南','南','西南','西','西北'];
+        allDirs.forEach(function(d) {
+            const item = document.createElement('div');
+            item.className = 'cpd-item';
+            const isCur = (d === dir8);
+            if (isCur) item.classList.add('cpd-cur');
+            const shansInDir = SHAN_24.filter(function(s) { return s.dir8 === d; });
+            const hasGood = shansInDir.some(function(s) {
+                return (yun && yun.idx === 8) && (s.wx === '火' || s.wx === '木');
+            });
+            const hasBad = shansInDir.some(function(s) {
+                return (yun && yun.idx === 8) && s.wx === '水';
+            });
+            if (hasGood && !hasBad) item.classList.add('cpd-good');
+            if (hasBad && !hasGood) item.classList.add('cpd-bad');
+            item.innerHTML = '<div class="cpd-label">' + (isCur ? '← 当前' : '') + '</div>' + d + '方';
+            listEl.appendChild(item);
+        });
+
+        document.getElementById('cpStatusText').textContent = '✅ 指南针已启动';
+    }
+
+    function startCompass() {
+        if (compassActive) return;
+        if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
+            DeviceOrientationEvent.requestPermission().then(function(state) {
+                if (state === 'granted') {
+                    window.addEventListener('deviceorientation', handleOrientation, true);
+                    compassActive = true;
+                    document.getElementById('cpStatusText').textContent = '✅ 指南针已启动，请水平放置手机';
+                    document.getElementById('cpStartBtn').style.display = 'none';
+                } else {
+                    document.getElementById('cpStatusText').textContent = '⚠️ 用户拒绝了权限';
+                }
+            }).catch(function(err) {
+                document.getElementById('cpStatusText').textContent = '⚠️ 启动失败: ' + err.message;
+            });
+        } else {
+            window.addEventListener('deviceorientation', handleOrientation, true);
+            compassActive = true;
+            document.getElementById('cpStatusText').textContent = '✅ 指南针已启动';
+            document.getElementById('cpStartBtn').style.display = 'none';
+            setTimeout(function() {
+                if (document.getElementById('cpDegree').textContent === '—°') {
+                    document.getElementById('cpStatusText').textContent = '⚠️ 未接收到传感器数据，请确认手机有磁力传感器';
+                }
+            }, 5000);
+        }
+    }
+
+    function initCompass() {
+        buildCompassRing();
+
+        if (typeof DeviceOrientationEvent === 'undefined') {
+            document.getElementById('cpStatusText').textContent = '⚠️ 此设备不支持指南针传感器';
+            return;
+        }
+
+        if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
+            document.getElementById('cpStatusText').innerHTML = '需要点击下方按钮启动指南针';
+            document.getElementById('cpStartBtn').style.display = 'inline-block';
+            document.getElementById('cpStartBtn').addEventListener('click', startCompass);
+        } else {
+            document.getElementById('cpStatusText').textContent = '启动指南针中...';
+            startCompass();
+        }
+    }
+
+    // ===== 初始化 =====
+    function init() {
+        // 设置当前时间
+        const now = new Date();
+        const info = getLunarInfo();
+        document.getElementById('headerTime').textContent =
+            now.getFullYear() + '年' + (now.getMonth()+1) + '月' + now.getDate() + '日 · ' +
+            '农历' + info.ms + '月' + info.ds + '日 · ' + SHICHEN[info.hi] + '时';
+
+        // 九宫飞星
+        updateFeiXing();
+
+        // 八宅：默认当前年
+        document.getElementById('bzYear').value = now.getFullYear();
+        updateBaZhai(now.getFullYear(), 'M');
+
+        // 二十四山
+        updateShanShui();
+
+        // 指南针
+        initCompass();
+
+        // 标签切换
+        document.querySelectorAll('.tab').forEach(function(tab) {
+            tab.addEventListener('click', function() {
+                document.querySelectorAll('.tab').forEach(function(t) { t.classList.remove('active'); });
+                document.querySelectorAll('.panel').forEach(function(p) { p.classList.remove('active'); });
+                tab.classList.add('active');
+                const map = { 'feixing': 'Feixing', 'bazhai': 'Bazhai', 'shanshui': 'Shanshui', 'compass': 'Compass' };
+                document.getElementById('panel' + map[tab.dataset.tab]).classList.add('active');
+            });
+        });
+
+        // 八宅按钮
+        document.getElementById('bzBtn').addEventListener('click', function() {
+            const y = parseInt(document.getElementById('bzYear').value) || 1990;
+            const g = document.getElementById('bzGender').value;
+            if (y < 1900 || y > 2100) { alert('请输入1900-2100之间的年份'); return; }
+            updateBaZhai(y, g);
+        });
+    }
+
+    // 延迟执行，给 lunar.js 加载时间
+    setTimeout(function() {
+        if (typeof Lunar !== 'undefined') {
+            init();
+        } else {
+            document.body.innerHTML = '<div style="color:#f0e6d0;text-align:center;padding:60px 20px;font-size:18px;">⚠️ lunar.js 未加载，尝试从 CDN 加载中...</div>';
+            var script = document.createElement('script');
+            script.src = 'https://cdn.jsdelivr.net/npm/lunar-javascript@1.7.2/dist/lunar.min.js';
+            script.onload = function() {
+                document.body.innerHTML = '';
+                document.body.innerHTML = '<div style="color:#f0e6d0;text-align:center;padding:30px 20px;font-size:16px;">✅ 已从 CDN 加载成功，页面即将刷新...</div>';
+                setTimeout(function() { location.reload(); }, 500);
+            };
+            script.onerror = function() {
+                document.body.innerHTML = '<div style="color:#f0e6d0;text-align:center;padding:60px 20px;font-size:18px;">⚠️ 无法加载 lunar.js，请检查网络连接或文件路径。</div>';
+            };
+            document.head.appendChild(script);
+        }
+    }, 300);
+})();
+</script>
+</body>
+</html>
