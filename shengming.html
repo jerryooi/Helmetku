@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>生命数字 · 完整命盘</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            min-height: 100vh;
+            background: linear-gradient(145deg, #1a1a2e 0%, #2b2b2b 100%);
+            font-family: 'Segoe UI', 'PingFang SC', Roboto, 'Microsoft YaHei', sans-serif;
+            padding: 20px 16px 40px;
+            color: #f0e6d0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .main-card {
+            background: rgba(255,255,255,0.06);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-radius: 36px;
+            padding: 28px 22px 30px;
+            max-width: 520px;
+            width: 100%;
+            box-shadow: 0 16px 50px rgba(0,0,0,0.4);
+            border: 1px solid rgba(255,255,255,0.06);
+            margin-bottom: 18px;
+        }
+        .header { text-align: center; margin-bottom: 20px; }
+        .header h1 {
+            font-size: 28px; letter-spacing: 6px; color: #f7d49e;
+            font-weight: 400; text-shadow: 0 2px 10px rgba(0,0,0,0.4);
+        }
+        .header .sub { font-size: 13px; color: #8a9a90; letter-spacing: 3px; margin-top: 4px; }
+
+        .input-row {
+            display: flex; gap: 10px; align-items: center;
+            justify-content: center; flex-wrap: wrap; margin-bottom: 20px;
+        }
+        .input-row input {
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,215,150,0.12);
+            padding: 12px 16px; border-radius: 30px; color: #f0e6d0;
+            font-size: 16px; outline: none; width: 170px; text-align: center;
+        }
+        .input-row input:focus { border-color: #f7d49e; }
+        .input-row button {
+            background: radial-gradient(circle at 30% 20%, #d4b8d8, #a888b0);
+            border: none; padding: 12px 28px; border-radius: 30px;
+            color: #1a1a2e; font-size: 16px; font-weight: 600; cursor: pointer;
+            box-shadow: 0 4px 0 #6a5a72; transition: all 0.1s;
+            letter-spacing: 2px;
+        }
+        .input-row button:active { transform: translateY(4px); box-shadow: 0 0 0 #6a5a72; }
+
+        .result-area { display: none; }
+        .result-area.show { display: block; }
+
+        /* ===== 主数字大显示 ===== */
+        .hero-num {
+            text-align: center; padding: 18px 10px 14px;
+            background: rgba(247,212,158,0.04);
+            border-radius: 24px;
+            border: 1px solid rgba(255,215,150,0.08);
+            margin-bottom: 16px;
+        }
+        .hero-num .big {
+            font-size: 80px; font-weight: 700; color: #fadc9f;
+            text-shadow: 0 0 40px rgba(247,212,158,0.12);
+            line-height: 1;
+        }
+        .hero-num .big-name { font-size: 24px; color: #f0dcc0; letter-spacing: 4px; margin-top: 4px; }
+        .hero-num .big-keyword { font-size: 15px; color: #b8a98a; margin-top: 4px; letter-spacing: 2px; }
+        .hero-num .big-date { font-size: 13px; color: #7a6e58; margin-top: 6px; }
+
+        /* ===== 数字网格 ===== */
+        .num-grid {
+            display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px;
+            margin-bottom: 14px;
+        }
+        .num-grid .ng-item {
+            background: rgba(255,255,255,0.03);
+            border-radius: 14px; padding: 12px 8px; text-align: center;
+            border: 1px solid rgba(255,215,150,0.05);
+        }
+        .ng-item .ng-label { font-size: 10px; color: #7a6e58; letter-spacing: 1px; }
+        .ng-item .ng-val { font-size: 26px; font-weight: 600; color: #fadc9f; margin-top: 2px; }
+        .ng-item .ng-name { font-size: 11px; color: #b8a98a; margin-top: 2px; }
+
+        .section-title {
+            font-size: 13px; color: #8f8068; letter-spacing: 3px;
+            margin: 14px 0 8px; border-left: 3px solid rgba(247,212,158,0.3);
+            padding-left: 10px;
+        }
+
+        /* ===== 天赋数字 ===== */
+        .talent-grid {
+            display: grid; grid-template-columns: repeat(9,1fr); gap: 4px;
+            margin: 8px 0 12px;
+        }
+        .talent-grid .tal-cell {
+            background: rgba(255,255,255,0.03); border-radius: 10px;
+            padding: 8px 2px; text-align: center;
+            border: 1px solid rgba(255,215,150,0.04);
+        }
+        .tal-cell .tal-num { font-size: 20px; font-weight: 600; color: #fadc9f; }
+        .tal-cell .tal-bar {
+            height: 3px; border-radius: 2px; margin: 4px auto 0;
+            max-width: 80%; transition: width 0.5s;
+        }
+        .tal-cell .tal-count { font-size: 10px; color: #7a6e58; margin-top: 2px; }
+
+        /* ===== 信息区块 ===== */
+        .info-block {
+            padding: 14px 16px;
+            background: rgba(247,212,158,0.04);
+            border-radius: 16px;
+            border: 1px solid rgba(255,200,150,0.06);
+            margin-top: 8px;
+        }
+        .info-block .ib-title {
+            font-size: 15px; color: #f7d49e; letter-spacing: 2px; margin-bottom: 6px;
+        }
+        .info-block .ib-text {
+            font-size: 15px; color: #d4c5a6; line-height: 1.9;
+        }
+        .info-block .ib-text b { color: #fadc9f; }
+        .info-block .ib-text .ok { color: #a0d8b0; }
+        .info-block .ib-text .no { color: #d8a0a0; }
+
+        .info-block.alt { background: rgba(200,200,220,0.04); border-color: rgba(200,200,220,0.06); }
+
+        /* ===== 双栏 ===== */
+        .double-col {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 6px;
+            margin-top: 8px;
+        }
+        @media (max-width:400px) { .double-col { grid-template-columns: 1fr; } }
+        .double-col .dc-item {
+            background: rgba(255,255,255,0.03); border-radius: 12px;
+            padding: 10px 12px; border: 1px solid rgba(255,215,150,0.04);
+        }
+        .dc-item .dc-label { font-size: 10px; color: #7a6e58; letter-spacing: 1px; }
+        .dc-item .dc-val { font-size: 14px; color: #d4c5a6; margin-top: 4px; line-height: 1.6; }
+
+        /* ===== 人生周期 ===== */
+        .cycle-grid {
+            display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px;
+            margin-top: 8px;
+        }
+        .cycle-grid .cyc-item {
+            background: rgba(255,255,255,0.03); border-radius: 12px;
+            padding: 10px 8px; text-align: center;
+            border: 1px solid rgba(255,215,150,0.04);
+        }
+        .cyc-item .cyc-label { font-size: 10px; color: #7a6e58; }
+        .cyc-item .cyc-age { font-size: 11px; color: #b8a98a; }
+        .cyc-item .cyc-num { font-size: 22px; font-weight: 600; color: #fadc9f; margin-top: 2px; }
+        .cyc-item .cyc-name { font-size: 11px; color: #b8a98a; }
+
+        .back-link { text-align: center; margin-top: 14px; }
+        .back-link a {
+            color: #8a9a90; text-decoration: none; font-size: 14px;
+            letter-spacing: 2px; border: 1px solid rgba(255,215,150,0.1);
+            padding: 10px 24px; border-radius: 30px; display: inline-block;
+            transition: all 0.2s;
+        }
+        .back-link a:hover { border-color: rgba(255,215,150,0.25); color: #b8a98a; }
+
+        .footer { text-align: center; font-size: 12px; color: #4f4538; letter-spacing: 2px; margin-top: 14px; }
+    </style>
+</head>
+<body>
+    <div class="main-card">
+        <div class="header">
+            <h1>🔢 生命数字</h1>
+            <div class="sub">完整命盘 · 天赋 · 流年 · 人生周期</div>
+        </div>
+
+        <div class="input-row">
+            <input type="date" id="birthDate" />
+            <button id="calcBtn">算 命</button>
+        </div>
+
+        <div class="result-area" id="resultArea">
+
+            <!-- 主数字 -->
+            <div class="hero-num">
+                <div class="big" id="lifeNum">—</div>
+                <div class="big-name" id="lifeName">—</div>
+                <div class="big-keyword" id="lifeKeyword">—</div>
+                <div class="big-date" id="birthDisplay"></div>
+            </div>
+
+            <!-- 六个辅助数字 -->
+            <div class="num-grid">
+                <div class="ng-item">
+                    <div class="ng-label">生日数</div>
+                    <div class="ng-val" id="dayNum">—</div>
+                    <div class="ng-name" id="dayName">—</div>
+                </div>
+                <div class="ng-item">
+                    <div class="ng-label">表现数</div>
+                    <div class="ng-val" id="expressNum">—</div>
+                    <div class="ng-name" id="expressName">—</div>
+                </div>
+                <div class="ng-item">
+                    <div class="ng-label">人格数</div>
+                    <div class="ng-val" id="personNum">—</div>
+                    <div class="ng-name" id="personName">—</div>
+                </div>
+                <div class="ng-item">
+                    <div class="ng-label">成熟数</div>
+                    <div class="ng-val" id="matureNum">—</div>
+                    <div class="ng-name" id="matureName">—</div>
+                </div>
+                <div class="ng-item">
+                    <div class="ng-label">流年数</div>
+                    <div class="ng-val" id="yearNum">—</div>
+                    <div class="ng-name" id="yearName">—</div>
+                </div>
+                <div class="ng-item">
+                    <div class="ng-label">挑战数</div>
+                    <div class="ng-val" id="challengeNum">—</div>
+                    <div class="ng-name" id="challengeName">—</div>
+                </div>
+            </div>
+
+            <!-- 天赋数字能量分布 -->
+            <div class="section-title">⊙ 数字能量分布</div>
+            <div class="talent-grid" id="talentGrid"></div>
+
+            <!-- 性格特质 -->
+            <div class="section-title">⊙ 性格特质</div>
+            <div class="info-block">
+                <div class="ib-title" id="traitTitle">—</div>
+                <div class="ib-text" id="traitText">—</div>
+            </div>
+
+            <!-- 优势与劣势 -->
+            <div class="section-title">⊙ 优势 · 劣势</div>
+            <div class="info-block alt">
+                <div class="ib-text" id="prosCons">—</div>
+            </div>
+
+            <!-- 职业与人际 -->
+            <div class="section-title">⊙ 职业 · 人际 · 幸运</div>
+            <div class="double-col">
+                <div class="dc-item">
+                    <div class="dc-label">适合职业</div>
+                    <div class="dc-val" id="careerText">—</div>
+                </div>
+                <div class="dc-item">
+                    <div class="dc-label">人际关系</div>
+                    <div class="dc-val" id="relationText">—</div>
+                </div>
+                <div class="dc-item">
+                    <div class="dc-label">幸运方向</div>
+                    <div class="dc-val" id="luckyDir">—</div>
+                </div>
+                <div class="dc-item">
+                    <div class="dc-label">幸运颜色·数字</div>
+                    <div class="dc-val" id="luckyColor">—</div>
+                </div>
+            </div>
+
+            <!-- 人生周期 -->
+            <div class="section-title">⊙ 人生三大周期</div>
+            <div class="cycle-grid" id="cycleGrid"></div>
+
+            <!-- 流年运势 -->
+            <div class="section-title">⊙ 今年流年运势</div>
+            <div class="info-block alt">
+                <div class="ib-title" id="yearTitle">—</div>
+                <div class="ib-text" id="yearText">—</div>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="back-link">
+        <a href="./index.html">‹ 返回首页</a>
+    </div>
+    <div class="footer">以出生日期探索你的完整命运密码</div>
+
+    <script>
+        (function() {
+            // ===== 完整数字数据库 =====
+            const NUM_DB = {
+                1: {
+                    name: '开创者',
+                    keyword: '独立 · 自信 · 领导',
+                    trait: '你是天生的<b>领导者</b>，拥有强大的独立意志和开创精神。你不需要依赖他人，就能走出自己的路。你有着敏锐的洞察力和果断的决策力，总是能在关键时刻站出来引领方向。你不畏惧挑战，反而在困难中越挫越勇。你的内心有着强烈的自我驱动力，渴望证明自己的价值。<br><br>然而，你需要学会的是<b>平衡自我与他人</b>。真正的领导者不是独行侠，而是能够带动周围人一起前进的人。当你学会尊重他人的节奏、倾听他人的声音，你的领导力才能真正发挥到极致。',
+                    pros: '<b>✅ 优点：</b><br>• 自信果敢，不畏挑战<br>• 创新能力强，善于开拓<br>• 独立自主，不依赖他人<br>• 有领袖魅力，能带动团队<br><br><b>⚠️ 缺点：</b><br>• 容易自我中心，忽视他人<br>• 固执己见，不善妥协<br>• 缺乏耐心，容易急躁<br>• 孤独感强，不擅示弱',
+                    career: '企业家、管理者、创业者、项目经理、军官、运动员、设计师、发明家、自由职业者',
+                    relation: '与 <b>2、4、8</b> 号人最合拍。1号人的独立自信，需要2号人的温柔包容、4号人的稳定支持、8号人的实力共鸣来平衡。<br><br>与 <b>5、7</b> 号人也能互相欣赏，但需要给对方足够的空间。<br><br>⚠️ 与 <b>3、6</b> 号人容易产生冲突，需要耐心磨合。',
+                    luckyDir: '东方、北方',
+                    luckyColor: '红色、金色、白色',
+                    luckyNum: '1、4、8',
+                    cycle1: '学习独立、建立自我认同的时期',
+                    cycle2: '发挥领导力、开创事业的黄金期',
+                    cycle3: '分享智慧、传承经验的阶段'
+                },
+                2: {
+                    name: '调和者',
+                    keyword: '合作 · 敏感 · 平衡',
+                    trait: '你是天生的<b>协调者</b>，拥有敏锐的感知力和强大的共情能力。你能轻易察觉他人的情绪和需求，善于在各方之间找到平衡点。你的温和与包容让你成为最值得信赖的朋友和伙伴。你不是那种争强好胜的人，但你有着自己独特的柔软力量。<br><br>你需要学习的是<b>设立边界</b>。你的善良和体贴是天赋，但过度的迁就会让你失去自我。学会在照顾他人和照顾自己之间找到平衡，是你人生的重要课题。你的力量不在于强势，而在于以柔克刚的智慧。',
+                    pros: '<b>✅ 优点：</b><br>• 温和体贴，善解人意<br>• 合作精神强，团队润滑剂<br>• 直觉敏锐，洞察人心<br>• 有耐心，善于倾听<br><br><b>⚠️ 缺点：</b><br>• 容易依赖他人，缺乏主见<br>• 优柔寡断，难以做决定<br>• 过度敏感，容易受伤<br>• 害怕冲突，回避问题',
+                    career: '心理咨询师、外交官、调解员、护士、教师、人力资源、客服、设计师、音乐家',
+                    relation: '与 <b>1、4、8</b> 号人最合拍。2号人的温柔需要1号人的保护、4号人的稳定、8号人的实力来支撑。<br><br>与 <b>6、9</b> 号人也能产生深刻共鸣，都是重视关系的人。<br><br>⚠️ 与 <b>3、5</b> 号人节奏不同，需要互相理解和包容。',
+                    luckyDir: '西南方、西北方',
+                    luckyColor: '银色、蓝色、绿色',
+                    luckyNum: '2、6、9',
+                    cycle1: '学习合作、建立人际关系的时期',
+                    cycle2: '发挥协调力、事业稳步发展',
+                    cycle3: '以智慧与爱引领他人'
+                },
+                3: {
+                    name: '创作者',
+                    keyword: '表达 · 社交 · 乐观',
+                    trait: '你是天生的<b>表达者</b>，拥有源源不断的创意和魅力。你乐观开朗，风趣幽默，无论走到哪里都能成为人群中的焦点。你的想象力和创造力是你的超能力，你总能用独特的方式展现这个世界的美丽。你喜欢分享，热爱社交，你的热情具有感染力。<br><br>你需要学习的是<b>专注与深度</b>。你的天赋在于广度，但真正的成就在于深度。学会把精力集中在最重要的目标上，培养持之以恒的毅力，你的才华才能真正开花结果。记住，灵感需要行动来兑现。',
+                    pros: '<b>✅ 优点：</b><br>• 才华横溢，创意丰富<br>• 社交能力强，人缘好<br>• 乐观开朗，正能量满满<br>• 幽默风趣，善于表达<br><br><b>⚠️ 缺点：</b><br>• 容易分心，缺乏专注<br>• 情绪波动大，不够稳定<br>• 可能浮夸，不够务实<br>• 害怕孤独，依赖外界认可',
+                    career: '作家、艺术家、演员、主持人、设计师、广告创意、音乐人、讲师、网红',
+                    relation: '与 <b>5、7、9</b> 号人最合拍。3号人的创意需要5号人的自由、7号人的深度、9号人的远见来激发。<br><br>与 <b>1、4</b> 号人也能互补，一个给你动力，一个给你稳定。<br><br>⚠️ 与 <b>2、6</b> 号人需要学会互相理解不同的表达方式。',
+                    luckyDir: '南方、东南方',
+                    luckyColor: '黄色、橙色、天蓝色',
+                    luckyNum: '3、6、9',
+                    cycle1: '发展创造力、探索自我表达的时期',
+                    cycle2: '才华绽放、社交圈扩大的黄金期',
+                    cycle3: '以智慧和创作影响他人'
+                },
+                4: {
+                    name: '建设者',
+                    keyword: '稳定 · 务实 · 纪律',
+                    trait: '你是天生的<b>建设者</b>，务实可靠，是周围人最信赖的依靠。你有着强大的执行力和组织力，任何交到你手上的事情都能被稳妥地完成。你注重秩序和纪律，做事脚踏实地，不投机取巧。你是那种在困难时刻最能稳住局面的人，你的存在本身就是一种安全感。<br><br>你需要学习的是<b>拥抱变化</b>。你的稳定和坚持是美德，但过度的固执会让你错失很多机会。学会在保持根基的同时，灵活地适应变化，你的人生会更加丰富多彩。记住，最好的建设者是既有坚实的地基，又有开放的格局。',
+                    pros: '<b>✅ 优点：</b><br>• 踏实可靠，值得信赖<br>• 执行力强，说到做到<br>• 组织能力强，条理清晰<br>• 忠诚守信，有责任感<br><br><b>⚠️ 缺点：</b><br>• 过于固执，缺乏变通<br>• 容易钻牛角尖<br>• 保守谨慎，害怕风险<br>• 可能过于严肃，缺少情趣',
+                    career: '建筑师、会计师、工程师、项目经理、律师、银行家、医生、编辑、行政管理',
+                    relation: '与 <b>1、2、8</b> 号人最合拍。4号人的稳定需要1号人的引领、2号人的温暖、8号人的实力。<br><br>与 <b>6、7</b> 号人也能互相欣赏，都是认真负责的类型。<br><br>⚠️ 与 <b>3、5</b> 号人性格差异较大，需要用包容的心态相处。',
+                    luckyDir: '东北方、西方',
+                    luckyColor: '灰色、棕色、深蓝色',
+                    luckyNum: '4、6、8',
+                    cycle1: '建立基础、学习纪律与责任的时期',
+                    cycle2: '事业稳固、财富积累的黄金期',
+                    cycle3: '以智慧和经验造福他人'
+                },
+                5: {
+                    name: '自由者',
+                    keyword: '冒险 · 变化 · 探索',
+                    trait: '你是天生的<b>自由者</b>，热爱冒险和探索未知的世界。你的好奇心永无止境，总想看看下一座山后面是什么。你适应力极强，能在任何环境中找到生存之道。你多才多艺，兴趣广泛，不喜欢被束缚在固定的框架里。你的生命是一场精彩的旅行。<br><br>你需要学习的是<b>承诺与坚持</b>。自由是礼物，但过度的自由会让你飘忽不定。学会在享受变化的同时，对某些重要的人和事做出承诺，你的人生会更有深度。真正的自由不是没有束缚，而是有能力选择自己想要的生活。',
+                    pros: '<b>✅ 优点：</b><br>• 适应力强，随机应变<br>• 勇敢冒​​险，不畏未知<br>• 多才多艺，兴趣广泛<br>• 口才佳，善于沟通<br><br><b>⚠️ 缺点：</b><br>• 缺乏耐心，容易厌倦<br>• 不负责任，逃避承诺<br>• 冲动行事，欠考虑<br>• 无法安定，飘忽不定',
+                    career: '旅行家、记者、销售、市场推广、翻译、导游、自由职业者、探险家、摄影师',
+                    relation: '与 <b>1、3、7</b> 号人最合拍。5号人的自由需要1号人的方向、3号人的乐趣、7号人的深度。<br><br>与 <b>9</b> 号人也能互相理解对世界的热爱。<br><br>⚠️ 与 <b>4、6</b> 号人需要学会互相尊重不同的生活节奏和价值观。',
+                    luckyDir: '西方、西北方',
+                    luckyColor: '紫色、红色、白色',
+                    luckyNum: '5、7、9',
+                    cycle1: '探索世界、寻找自我的时期',
+                    cycle2: '事业多元化、人脉拓展的黄金期',
+                    cycle3: '以智慧和阅历启迪他人'
+                },
+                6: {
+                    name: '守护者',
+                    keyword: '责任 · 关爱 · 疗愈',
+                    trait: '你是天生的<b>守护者</b>，充满爱心和强烈的责任感。你重视家庭和人际关系，愿意为所爱之人付出一切。你有着敏锐的审美力和对美的追求，同时也具备强大的疗愈能力。你追求和谐与平衡，厌恶冲突和不公。你的存在让周围的人感到温暖和安全。<br><br>你需要学习的是<b>不过度牺牲</b>。你的善良和责任感是美德，但过度的付出会让你身心俱疲。学会在照顾他人的同时，也照顾好自己。记住，只有先充盈自己，才能真正地给予他人。你的使命是用爱疗愈世界，但不代表要燃烧自己去照亮别人。',
+                    pros: '<b>✅ 优点：</b><br>• 有爱心，乐于付出<br>• 责任感强，值得信赖<br>• 审美力佳，有艺术天赋<br>• 重视家庭，重感情<br><br><b>⚠️ 缺点：</b><br>• 过度挑剔，完美主义<br>• 爱操心，容易焦虑<br>• 容易自责，背负太多<br>• 控制欲强，难以放手',
+                    career: '教师、心理咨询师、医生、护士、室内设计师、艺术家、慈善工作者、家长、厨师',
+                    relation: '与 <b>2、4、9</b> 号人最合拍。6号人的关爱需要2号人的温柔、4号人的稳定、9号人的大爱来共鸣。<br><br>与 <b>1、8</b> 号人也能互补，一个给你力量，一个给你资源。<br><br>⚠️ 与 <b>3、5</b> 号人需要学会放松，不要过于拘泥于规则。',
+                    luckyDir: '西南方、南方',
+                    luckyColor: '粉色、米色、蓝色',
+                    luckyNum: '6、2、9',
+                    cycle1: '学习爱与责任、建立家庭观念的时期',
+                    cycle2: '事业稳定、家庭美满的黄金期',
+                    cycle3: '以智慧和爱心福泽他人'
+                },
+                7: {
+                    name: '探究者',
+                    keyword: '智慧 · 分析 · 灵性',
+                    trait: '你是天生的<b>探究者</b>，拥有深邃的思想和强大的分析能力。你不满足于表面现象，总是要探究事物的本质和真理。你热爱阅读、研究和思考，对哲学、科学和灵性领域有着天然的亲近感。你的直觉力极强，往往能一眼看穿事物的本质。你是那种在安静中积蓄力量的人。<br><br>你需要学习的是<b>走出孤独</b>。你的智慧和深度是天赋，但过度的独处会让你与世隔绝。学会与他人分享你的见解和智慧，你会发现交流能带来新的灵感和成长。真正的智慧不仅在于知道，更在于分享。',
+                    pros: '<b>✅ 优点：</b><br>• 聪明睿智，分析力强<br>• 善于研究，追求真理<br>• 直觉敏锐，洞察力强<br>• 有灵性，精神世界丰富<br><br><b>⚠️ 缺点：</b><br>• 过于孤僻，不善社交<br>• 疑心重，难以信任人<br>• 容易冷漠，情感疏离<br>• 不切实际，活在自己世界',
+                    career: '科学家、研究员、哲学家、教授、分析师、工程师、程序员、作家、心理咨询师',
+                    relation: '与 <b>3、5、9</b> 号人最合拍。7号人的深度需要3号人的活力、5号人的冒险、9号人的远见来平衡。<br><br>与 <b>1</b> 号人也能互相尊重各自的独立性。<br><br>⚠️ 与 <b>2、6</b> 号人需要学会表达情感，不要过于理性冷漠。',
+                    luckyDir: '西北方、东方',
+                    luckyColor: '紫色、靛色、灰色',
+                    luckyNum: '7、5、3',
+                    cycle1: '探索知识、发展思考能力的时期',
+                    cycle2: '专业精进、智慧沉淀的黄金期',
+                    cycle3: '以深邃智慧启迪世人'
+                },
+                8: {
+                    name: '成就者',
+                    keyword: '权力 · 富足 · 商业',
+                    trait: '你是天生的<b>成就者</b>，拥有强大的商业头脑和领导才能。你天生对权力和财富有着敏锐的嗅觉，善于管理和创造资源。你有着远大的抱负和强大的执行力，一旦设定了目标，就会全力以赴去实现。你的气场强大，能在关键时刻做出果断的决策。你是为成功而生的人。<br><br>你需要学习的是<b>平衡物质与精神</b>。你的能力和野心是天赋，但过度的追求外在成就可能会让你忽略了内心的声音。真正的富足不仅是物质的丰盛，更是精神的满足。学会在追求成功的同时，也关注内心的成长和关系的经营。',
+                    pros: '<b>✅ 优点：</b><br>• 商业头脑强，善于创造财富<br>• 领导力出众，有魄力<br>• 执行力强，说到做到<br>• 有远见，能把握大局<br><br><b>⚠️ 缺点：</b><br>• 过于功利，利益至上<br>• 工作狂，忽视生活<br>• 控制欲强，难以放手<br>• 感情用事，容易冲动',
+                    career: '企业CEO、投资银行家、创业者、政治家、管理者、经纪人、律师、房地产',
+                    relation: '与 <b>1、4、6</b> 号人最合拍。8号人的实力需要1号人的远见、4号人的稳定、6号人的温暖。<br><br>与 <b>2、9</b> 号人也能互补，一个给你支持，一个给你智慧。<br><br>⚠️ 与 <b>3、5</b> 号人需要学会放松，不要过于严肃和强势。',
+                    luckyDir: '西方、西南方',
+                    luckyColor: '金色、深红色、黑色',
+                    luckyNum: '8、4、1',
+                    cycle1: '学习管理、建立自信的时期',
+                    cycle2: '事业巅峰、财富积累的黄金期',
+                    cycle3: '以财富和影响力回馈社会'
+                },
+                9: {
+                    name: '智慧者',
+                    keyword: '博爱 · 慈悲 · 艺术',
+                    trait: '你是天生的<b>智慧者</b>，心怀大爱，拥有广阔的视野和深刻的人文关怀。你有着深厚的艺术天赋和创造力，对美和真理有着与生俱来的感知力。你富有慈悲心和同理心，能包容和理解不同的人和事物。你的理想主义让你总想为这个世界做些有意义的事情。<br><br>你需要学习的是<b>落地与专注</b>。你的广博和理想是天赋，但过度的追求完美会让你难以付诸实践。学会将你的理想转化为具体的行动，在脚踏实地中实现你的愿景。记住，真正的智慧不仅在于知道什么是对的，更在于用行动去创造改变。',
+                    pros: '<b>✅ 优点：</b><br>• 博爱宽容，有同理心<br>• 艺术天赋高，有创造力<br>• 有远见，格局大<br>• 慈悲为怀，乐于助人<br><br><b>⚠️ 缺点：</b><br>• 过于理想化，不切实际<br>• 容易受伤，情感脆弱<br>• 难以专注，容易分散<br>• 可能自我牺牲过度',
+                    career: '艺术家、慈善家、教育家、社会工作者、心理咨询师、哲学家、导演、作家、医生',
+                    relation: '与 <b>3、6、7</b> 号人最合拍。9号人的大爱需要3号人的乐观、6号人的关怀、7号人的智慧来共鸣。<br><br>与 <b>2、5</b> 号人也能互相理解对世界的热爱。<br><br>⚠️ 与 <b>1、8</b> 号人需要学会在理想与现实之间找到平衡。',
+                    luckyDir: '南方、东方',
+                    luckyColor: '红色、粉色、金色',
+                    luckyNum: '9、3、6',
+                    cycle1: '发展同理心、探索世界多元性的时期',
+                    cycle2: '创造力迸发、影响力扩大的黄金期',
+                    cycle3: '以智慧和慈悲利益众生'
+                },
+                11: {
+                    name: '启迪者',
+                    keyword: '直觉 · 灵感 · 高敏感',
+                    trait: '你属于<b>大师数 11</b>，拥有远超凡人的直觉力和灵性感知。你是一个天生的启迪者，能敏锐地感知到常人无法察觉的能量和信息。你有着强大的艺术灵感和创造力，同时也承受着高敏感带来的情绪波动。你来这个世界的目的，是唤醒和启发他人。<br><br>你的核心课题是<b>管理你的敏感度</b>。你的直觉和灵性是你的超能力，但过度的敏感会让你不堪重负。学会保护自己的能量场，建立健康的边界，你才能真正发挥你的天赋。当你学会驾驭你的灵性力量时，你将成为照亮他人道路的光。',
+                    pros: '<b>✅ 优点：</b><br>• 直觉超强，洞察先机<br>• 富有灵感和创造力<br>• 灵性高，有超凡感知<br>• 有启迪他人的能力<br><br><b>⚠️ 缺点：</b><br>• 过于敏感，容易焦虑<br>• 情绪波动大<br>• 不切实际，容易飘忽<br>• 精神压力大，容易倦怠',
+                    career: '灵性导师、心理咨询师、艺术家、音乐家、作家、能量治疗师、占卜师、教练',
+                    relation: '与 <b>3、7、9</b> 号人最合拍，能理解你的灵性和敏感。<br><br>与 <b>1、4</b> 号人也能互补，帮你落地。<br><br>⚠️ 与过于现实、缺乏包容力的人相处会让你感到疲惫。',
+                    luckyDir: '东方、东南方',
+                    luckyColor: '银色、紫色、珍珠白',
+                    luckyNum: '11、7、3',
+                    cycle1: '学习管理敏感度、发展直觉的时期',
+                    cycle2: '发挥灵性天赋、启迪他人的黄金期',
+                    cycle3: '成为智慧与灵性的引路人'
+                },
+                22: {
+                    name: '建造者',
+                    keyword: '远见 · 实践 · 大师',
+                    trait: '你属于<b>大师数 22</b>，被称为"建筑大师"。你拥有将宏大的梦想变为现实的神奇能力。你不只是有远见，你还有将其落地的强大执行力和组织力。你是那种既能仰望星空，又能脚踏实地的人。你有能力建造对世界有持久价值的事物，影响千万人。<br><br>你的核心课题是<b>承受巨大压力的能力</b>。你的天赋是卓越的，但随之而来的是巨大的责任和压力。学会管理压力，照顾好身心健康，你才能持续地发挥你的天赋。当你平衡好宏大愿景和身心平衡时，你将成为改变世界的力量。',
+                    pros: '<b>✅ 优点：</b><br>• 远见卓识，格局宏大<br>• 执行力强，能落地实现<br>• 组织管理能力超群<br>• 务实而有远见<br><br><b>⚠️ 缺点：</b><br>• 压力过大，容易透支<br>• 对自己要求过高<br>• 容易焦虑和紧张<br>• 可能忽视身心健康',
+                    career: '大型企业CEO、城市规划师、建筑家、政治家、社会活动家、慈善家、项目总监',
+                    relation: '与 <b>1、4、8</b> 号人最能配合你实现宏大目标。<br><br>与 <b>6、9</b> 号人也能给你情感支持和智慧指引。<br><br>⚠️ 需要学会放松，不要总是绷紧神经。',
+                    luckyDir: '西方、西北方',
+                    luckyColor: '金色、深蓝色、白色',
+                    luckyNum: '22、8、4',
+                    cycle1: '学习将想法落地的时期',
+                    cycle2: '实现宏伟目标、建造影响力的黄金期',
+                    cycle3: '以智慧和成就福泽世界'
+                },
+                33: {
+                    name: '大爱者',
+                    keyword: '无私 · 奉献 · 疗愈',
+                    trait: '你属于最高的<b>大师数 33</b>，被称为"大爱者"。你拥有无条件的爱和深刻的慈悲心，你的存在本身就是一种疗愈。你来到这个世界上，是为了提升整个世界的频率，用你的爱和智慧去疗愈和唤醒他人。你是伟大的导师和疗愈者。<br><br>你的核心课题是<b>自我保护</b>。你的爱和奉献是无私的，但过度的付出会让你耗尽自己。学会设立边界，保护自己的能量，你才能持续地发光发热。记住，真正的爱不是牺牲，而是既爱他人也爱自己。当你学会平衡给予和接受时，你将展现出最伟大的爱。',
+                    pros: '<b>✅ 优点：</b><br>• 大爱无私，全然奉献<br>• 疗愈力极强<br>• 富有智慧和慈悲<br>• 能无条件地爱他人<br><br><b>⚠️ 缺点：</b><br>• 过度付出，容易耗尽<br>• 太过理想化<br>• 牺牲自我，忽视自己<br>• 情感负担过重',
+                    career: '灵性导师、疗愈师、慈善家、教育家、社会改革家、和平使者、宗教领袖',
+                    relation: '与 <b>6、9、11</b> 号人最能理解你的大爱和使命。<br><br>与 <b>2、7</b> 号人也能给你支持和智慧。<br><br>⚠️ 需要远离消耗你能量的人和事，保护好自己的能量场。',
+                    luckyDir: '南方、西南方',
+                    luckyColor: '金色、白色、粉色',
+                    luckyNum: '33、9、6',
+                    cycle1: '学习爱与奉献的课题',
+                    cycle2: '发挥疗愈力、引领他人的黄金期',
+                    cycle3: '成为爱与智慧的化身'
+                }
+            };
+
+            // ===== 工具函数 =====
+            function getData(n) { return NUM_DB[n] || NUM_DB[reduceNum(n)]; }
+
+            function reduceNum(n) {
+                n = parseInt(n);
+                if (isNaN(n)) return 1;
+                while (n > 9 && n !== 11 && n !== 22 && n !== 33) {
+                    n = String(n).split('').reduce(function(s, c) { return s + parseInt(c); }, 0);
+                }
+                return n;
+            }
+
+            function calcLifePath(y, m, d) {
+                const yr = reduceNum(String(y).split('').reduce(function(a, b) { return a + parseInt(b); }, 0));
+                const mr = reduceNum(m);
+                const dr = reduceNum(d);
+                return reduceNum(yr + mr + dr);
+            }
+
+            function calcDayNum(d) { return reduceNum(d); }
+
+            function calcExpressNum(y, m, d) {
+                return reduceNum(y + m + d);
+            }
+
+            function calcPersonNum(m, d) {
+                return reduceNum(m + d);
+            }
+
+            function calcMatureNum(lifePath, express) {
+                return reduceNum(lifePath + express);
+            }
+
+            function calcYearNum(y, m, d) {
+                const now = new Date();
+                const cy = now.getFullYear();
+                const total = y + m + d + cy;
+                return reduceNum(total);
+            }
+
+            function calcChallengeNum(y, m, d) {
+                const yR = reduceNum(y);
+                const mR = reduceNum(m);
+                const dR = reduceNum(d);
+                const c1 = Math.abs(yR - mR);
+                const c2 = Math.abs(mR - dR);
+                const c3 = Math.abs(c1 - c2);
+                return reduceNum(c3);
+            }
+
+            function getTalentCounts(y, m, d) {
+                const counts = {};
+                for (let i = 1; i <= 9; i++) counts[i] = 0;
+                String(y).split('').forEach(function(c) { var n = parseInt(c); if (n > 0) counts[n]++; });
+                String(m).split('').forEach(function(c) { var n = parseInt(c); if (n > 0) counts[n]++; });
+                String(d).split('').forEach(function(c) { var n = parseInt(c); if (n > 0) counts[n]++; });
+                return counts;
+            }
+
+            function getCycles(lifeNum) {
+                const d = getData(lifeNum);
+                return [
+                    { age: '0-30岁', num: reduceNum(lifeNum + 1), desc: d.cycle1 },
+                    { age: '31-60岁', num: reduceNum(lifeNum + 2), desc: d.cycle2 },
+                    { age: '61岁+', num: reduceNum(lifeNum + 3), desc: d.cycle3 }
+                ];
+            }
+
+            function getYearDesc(yearNum) {
+                const d = getData(yearNum);
+                return '今年的流年数是 <b>' + yearNum + '</b>，对应「<b>' + d.name + '</b>」的能量。' +
+                    '这一年你会在「' + d.keyword + '」方面有明显的体验和成长。' +
+                    '流年数的能量会放大你生命道路数的特质，是一个重要的成长年份。' +
+                    '建议你多关注' + (yearNum === 11 || yearNum === 22 || yearNum === 33 ? '灵性和内在成长' : '与流年数相关的领域') +
+                    '，把握今年的机遇。';
+            }
+
+            // ===== 更新界面 =====
+            function updateResult(dateStr) {
+                if (!dateStr) return;
+                const parts = dateStr.split('-');
+                const year = parseInt(parts[0]);
+                const month = parseInt(parts[1]);
+                const day = parseInt(parts[2]);
+
+                const lifeNum = calcLifePath(year, month, day);
+                const dayNum = calcDayNum(day);
+                const expressNum = calcExpressNum(year, month, day);
+                const personNum = calcPersonNum(month, day);
+                const matureNum = calcMatureNum(lifeNum, expressNum);
+                const yearNum = calcYearNum(year, month, day);
+                const challengeNum = calcChallengeNum(year, month, day);
+                const counts = getTalentCounts(year, month, day);
+
+                const data = getData(lifeNum);
+
+                document.getElementById('resultArea').classList.add('show');
+
+                // 主数字
+                document.getElementById('lifeNum').textContent = lifeNum;
+                document.getElementById('lifeName').textContent = data.name;
+                document.getElementById('lifeKeyword').textContent = data.keyword;
+                document.getElementById('birthDisplay').textContent =
+                    year + '年' + month + '月' + day + '日出生';
+
+                // 六小数字
+                document.getElementById('dayNum').textContent = dayNum;
+                document.getElementById('dayName').textContent = getData(dayNum).name;
+                document.getElementById('expressNum').textContent = expressNum;
+                document.getElementById('expressName').textContent = getData(expressNum).name;
+                document.getElementById('personNum').textContent = personNum;
+                document.getElementById('personName').textContent = getData(personNum).name;
+                document.getElementById('matureNum').textContent = matureNum;
+                document.getElementById('matureName').textContent = getData(matureNum).name;
+                document.getElementById('yearNum').textContent = yearNum;
+                document.getElementById('yearName').textContent = getData(yearNum).name;
+                document.getElementById('challengeNum').textContent = challengeNum;
+                document.getElementById('challengeName').textContent = getData(challengeNum).name;
+
+                // 能量分布
+                const tGrid = document.getElementById('talentGrid');
+                tGrid.innerHTML = '';
+                const maxCount = Math.max.apply(null, Object.values(counts));
+                for (let i = 1; i <= 9; i++) {
+                    const c = document.createElement('div');
+                    c.className = 'tal-cell';
+                    const pct = maxCount > 0 ? (counts[i] / maxCount * 100) : 0;
+                    const colors = ['#f7d49e','#d4b8d8','#a8d4c0','#b0c8e0','#d8c8a0','#d4a0a0','#a0b8d8','#c8b8a0','#d8b8c8'];
+                    c.innerHTML =
+                        '<div class="tal-num">' + i + '</div>' +
+                        '<div class="tal-bar" style="width:' + pct + '%;background:' + colors[i-1] + '"></div>' +
+                        '<div class="tal-count">' + counts[i] + 'x</div>';
+                    tGrid.appendChild(c);
+                }
+
+                // 性格特质
+                document.getElementById('traitTitle').textContent = '生命数字 ' + lifeNum + ' · ' + data.name;
+                document.getElementById('traitText').innerHTML = data.trait;
+
+                // 优缺点
+                document.getElementById('prosCons').innerHTML = data.pros;
+
+                // 职业与人际
+                document.getElementById('careerText').textContent = data.career;
+                document.getElementById('relationText').innerHTML = data.relation;
+                document.getElementById('luckyDir').textContent = data.luckyDir;
+                document.getElementById('luckyColor').textContent = data.luckyColor;
+
+                // 人生周期
+                const cycles = getCycles(lifeNum);
+                const cycGrid = document.getElementById('cycleGrid');
+                cycGrid.innerHTML = '';
+                cycles.forEach(function(c) {
+                    const item = document.createElement('div');
+                    item.className = 'cyc-item';
+                    const d = getData(c.num);
+                    item.innerHTML =
+                        '<div class="cyc-label">周期</div>' +
+                        '<div class="cyc-age">' + c.age + '</div>' +
+                        '<div class="cyc-num">' + c.num + '</div>' +
+                        '<div class="cyc-name">' + (d ? d.name : '') + '</div>';
+                    cycGrid.appendChild(item);
+                });
+
+                // 流年运势
+                const yearData = getData(yearNum);
+                document.getElementById('yearTitle').textContent =
+                    yearNum + ' · ' + yearData.name;
+                document.getElementById('yearText').innerHTML = getYearDesc(yearNum);
+            }
+
+            // ===== 初始化 =====
+            document.getElementById('calcBtn').addEventListener('click', function() {
+                const val = document.getElementById('birthDate').value;
+                if (!val) { alert('请选择出生日期'); return; }
+                updateResult(val);
+            });
+
+            const today = new Date();
+            const y = today.getFullYear();
+            const m = String(today.getMonth() + 1).padStart(2, '0');
+            const d = String(today.getDate()).padStart(2, '0');
+            document.getElementById('birthDate').value = y + '-' + m + '-' + d;
+
+            window.addEventListener('DOMContentLoaded', function() {
+                setTimeout(function() {
+                    updateResult(document.getElementById('birthDate').value);
+                }, 100);
+            });
+        })();
+    </script>
+</body>
+</html>
