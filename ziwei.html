@@ -1,0 +1,815 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>紫微斗数 · 完整命盘</title>
+    <!-- 引入 lunar.js 用于农历转换 -->
+    <script src="./lunar.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            min-height: 100vh;
+            background: linear-gradient(145deg, #1a0a1a 0%, #2b1a2e 100%);
+            font-family: 'Segoe UI', 'PingFang SC', Roboto, 'Microsoft YaHei', sans-serif;
+            padding: 20px 14px 40px;
+            color: #f0e6d0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .main-card {
+            background: rgba(255,255,255,0.06);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-radius: 36px;
+            padding: 28px 20px 30px;
+            max-width: 560px;
+            width: 100%;
+            box-shadow: 0 16px 50px rgba(0,0,0,0.4);
+            border: 1px solid rgba(255,215,150,0.06);
+            margin-bottom: 18px;
+        }
+        .header { text-align: center; margin-bottom: 20px; }
+        .header h1 {
+            font-size: 28px; letter-spacing: 6px; color: #f7d49e;
+            font-weight: 400; text-shadow: 0 2px 10px rgba(0,0,0,0.4);
+        }
+        .header .sub { font-size: 13px; color: #b8a98a; letter-spacing: 3px; margin-top: 4px; }
+
+        .input-row {
+            display: flex; gap: 8px; align-items: center;
+            justify-content: center; flex-wrap: wrap; margin-bottom: 18px;
+        }
+        .input-row input, .input-row select {
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,215,150,0.12);
+            padding: 10px 12px; border-radius: 30px; color: #f0e6d0;
+            font-size: 15px; outline: none; text-align: center;
+        }
+        .input-row input:focus, .input-row select:focus { border-color: #f7d49e; }
+        .input-row input[type="date"] { width: 160px; }
+        .input-row select { width: 70px; }
+        .input-row button {
+            background: radial-gradient(circle at 30% 20%, #d4a8c8, #a888b0);
+            border: none; padding: 10px 24px; border-radius: 30px;
+            color: #1a1a2e; font-size: 15px; font-weight: 600; cursor: pointer;
+            box-shadow: 0 4px 0 #6a5a72; transition: all 0.1s;
+            letter-spacing: 2px;
+        }
+        .input-row button:active { transform: translateY(4px); box-shadow: 0 0 0 #6a5a72; }
+
+        .result-area { display: none; }
+        .result-area.show { display: block; }
+
+        .info-bar {
+            display: flex; flex-wrap: wrap; gap: 6px 12px;
+            padding: 10px 14px; background: rgba(255,255,255,0.03);
+            border-radius: 14px; border: 1px solid rgba(255,215,150,0.05);
+            margin-bottom: 14px;
+        }
+        .info-bar .ib-l { font-size: 11px; color: #7a6e58; }
+        .info-bar .ib-v { font-size: 14px; color: #eacc9a; font-weight: 500; }
+        .info-bar .sep { color: #4f4538; }
+
+        .section-title {
+            font-size: 13px; color: #8f8068; letter-spacing: 3px;
+            margin: 14px 0 8px; border-left: 3px solid rgba(247,212,158,0.3);
+            padding-left: 10px;
+        }
+
+        /* ===== 命盘表格 ===== */
+        .chart-wrap {
+            overflow-x: auto; margin-bottom: 14px;
+        }
+        .chart-table {
+            width: 100%; min-width: 340px; border-collapse: collapse;
+            font-size: 13px;
+        }
+        .chart-table td {
+            border: 1px solid rgba(255,215,150,0.1);
+            padding: 6px 4px; text-align: center; vertical-align: top;
+            min-width: 70px; height: 90px;
+            background: rgba(255,255,255,0.02);
+        }
+        .chart-table td .cp-gong {
+            font-size: 11px; color: #8a9a90; letter-spacing: 1px;
+        }
+        .chart-table td .cp-main {
+            font-size: 14px; font-weight: 600; color: #f0dcc0;
+        }
+        .chart-table td .cp-main.major { color: #f7d49e; }
+        .chart-table td .cp-assist {
+            font-size: 11px; color: #b8a98a;
+        }
+        .chart-table td .cp-hua {
+            font-size: 10px; color: #d8a8c8;
+        }
+        .chart-table td .cp-empty {
+            font-size: 11px; color: #5a4e48;
+        }
+        .chart-table td.cp-self {
+            background: rgba(247,212,158,0.06);
+            border-color: rgba(247,212,158,0.2);
+        }
+        .chart-table td.cp-ji {
+            border-color: rgba(220,100,100,0.15);
+            background: rgba(220,100,100,0.03);
+        }
+        .chart-table td.cp-xiong {
+            border-color: rgba(100,100,100,0.15);
+            background: rgba(100,100,100,0.03);
+        }
+
+        /* ===== 宫位解读 ===== */
+        .gong-list { display: flex; flex-direction: column; gap: 8px; }
+        .gong-item {
+            background: rgba(255,255,255,0.03);
+            border-radius: 16px; padding: 14px 16px;
+            border: 1px solid rgba(255,215,150,0.05);
+        }
+        .gong-item .gi-header {
+            display: flex; flex-wrap: wrap; align-items: baseline;
+            gap: 6px 12px; margin-bottom: 6px;
+        }
+        .gi-header .gi-name {
+            font-size: 18px; font-weight: 500; color: #f7d49e;
+            letter-spacing: 2px;
+        }
+        .gi-header .gi-stars {
+            font-size: 14px; color: #f0dcc0;
+        }
+        .gi-header .gi-tag {
+            font-size: 11px; padding: 2px 10px;
+            border-radius: 12px; background: rgba(255,215,150,0.08);
+            border: 1px solid rgba(255,215,150,0.1); color: #eacc9a;
+        }
+        .gi-header .gi-tag.good { background: rgba(100,200,150,0.08); border-color: rgba(100,200,150,0.15); color: #a0d8b0; }
+        .gi-header .gi-tag.bad { background: rgba(220,100,100,0.08); border-color: rgba(220,100,100,0.15); color: #d8a0a0; }
+        .gong-item .gi-hua {
+            font-size: 12px; color: #d8a8c8; margin-bottom: 4px;
+        }
+        .gong-item .gi-meaning {
+            font-size: 14px; color: #d4c5a6; line-height: 1.8;
+        }
+        .gong-item .gi-advice {
+            margin-top: 6px; padding: 6px 12px;
+            background: rgba(247,212,158,0.04);
+            border-radius: 10px; font-size: 13px; color: #b8a98a;
+            border-left: 2px solid rgba(247,212,158,0.2);
+        }
+
+        .back-link { text-align: center; margin-top: 14px; }
+        .back-link a {
+            color: #8a9a90; text-decoration: none; font-size: 14px;
+            letter-spacing: 2px; border: 1px solid rgba(255,215,150,0.1);
+            padding: 10px 24px; border-radius: 30px; display: inline-block;
+            transition: all 0.2s;
+        }
+        .back-link a:hover { border-color: rgba(255,215,150,0.25); color: #b8a98a; }
+
+        .footer { text-align: center; font-size: 12px; color: #4f4538; letter-spacing: 2px; margin-top: 14px; }
+    </style>
+</head>
+<body>
+    <div class="main-card">
+        <div class="header">
+            <h1>✦ 紫微斗数 ✦</h1>
+            <div class="sub">完整命盘 · 十二宫 · 主星 · 四化</div>
+        </div>
+
+        <div class="input-row">
+            <input type="date" id="birthDate" />
+            <select id="birthHour">
+                <option value="23">子时 23-01</option>
+                <option value="1">丑时 01-03</option>
+                <option value="3">寅时 03-05</option>
+                <option value="5" selected>卯时 05-07</option>
+                <option value="7">辰时 07-09</option>
+                <option value="9">巳时 09-11</option>
+                <option value="11">午时 11-13</option>
+                <option value="13">未时 13-15</option>
+                <option value="15">申时 15-17</option>
+                <option value="17">酉时 17-19</option>
+                <option value="19">戌时 19-21</option>
+                <option value="21">亥时 21-23</option>
+            </select>
+            <select id="birthGender">
+                <option value="M">男</option>
+                <option value="F">女</option>
+            </select>
+            <button id="calcBtn">排 盘</button>
+        </div>
+
+        <div class="result-area" id="resultArea">
+
+            <!-- 基本信息 -->
+            <div class="info-bar" id="baseInfo"></div>
+
+            <!-- 命盘表格 -->
+            <div class="section-title">⊙ 十二宫命盘</div>
+            <div class="chart-wrap">
+                <table class="chart-table" id="chartTable"></table>
+            </div>
+
+            <!-- 命宫主星解说 -->
+            <div class="section-title">⊙ 命宫主星解读</div>
+            <div class="gong-list" id="lifeGong"></div>
+
+            <!-- 其他十一宫解读 -->
+            <div class="section-title">⊙ 十二宫详细解读</div>
+            <div class="gong-list" id="allGongs"></div>
+
+            <!-- 四化 -->
+            <div class="section-title">⊙ 四化飞星</div>
+            <div class="gong-item" id="huaSection"></div>
+
+            <!-- 格局 -->
+            <div class="section-title">⊙ 命盘格局</div>
+            <div class="gong-item" id="patternSection"></div>
+
+        </div>
+    </div>
+
+    <div class="back-link">
+        <a href="./index.html">‹ 返回首页</a>
+    </div>
+    <div class="footer">以出生年月日时排盘 · 紫微斗数全盘解读</div>
+
+    <script>
+        (function() {
+            // ========== 检查 lunar.js ==========
+            if (typeof Lunar === 'undefined') {
+                document.body.innerHTML = '<div style="color:#f0e6d0;text-align:center;padding:60px 20px;font-size:18px;">⚠️ lunar.js 未加载，请确认文件路径正确。</div>';
+                return;
+            }
+
+            // ========== 常量 ==========
+            const ZHI = ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
+            const SHICHEN = ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
+
+            // ========== 主星定义 ==========
+            const ZHU_XING = {
+                // 紫微系
+                '紫微': { type: '紫微', yin: '阴', wx: '土', attr: '吉', desc: '帝王星，尊贵、领导、稳重。主权威、地位、事业心。' },
+                '天机': { type: '紫微', yin: '阴', wx: '木', attr: '吉', desc: '谋士星，智慧、灵动、善变。主思考、策划、变动。' },
+                '太阳': { type: '紫微', yin: '阳', wx: '火', attr: '吉', desc: '光明星，热情、慷慨、博爱。主官贵、名声、付出。' },
+                '武曲': { type: '紫微', yin: '阴', wx: '金', attr: '吉', desc: '财星，刚毅、果决、务实。主财富、勇气、执行力。' },
+                '天同': { type: '紫微', yin: '阳', wx: '水', attr: '吉', desc: '福星，温和、善良、知足。主福气、和谐、享乐。' },
+                '廉贞': { type: '紫微', yin: '阴', wx: '火', attr: '凶', desc: '次桃花星，复杂、善变、多才。主是非、才华、桃花。' },
+                // 天府系
+                '天府': { type: '天府', yin: '阳', wx: '土', attr: '吉', desc: '财库星，稳重、保守、富足。主财库、安定、包容。' },
+                '太阴': { type: '天府', yin: '阴', wx: '水', attr: '吉', desc: '田宅主，温柔、内敛、美丽。主财富、审美、感情。' },
+                '贪狼': { type: '天府', yin: '阳', wx: '木', attr: '凶', desc: '桃花星，欲望、多才、善交际。主桃花、才华、欲望。' },
+                '巨门': { type: '天府', yin: '阳', wx: '水', attr: '凶', desc: '口舌星，言辞、是非、暗蔽。主口才、是非、思虑。' },
+                '天相': { type: '天府', yin: '阳', wx: '水', attr: '吉', desc: '印星，公正、协调、温和。主贵人、助力、平衡。' },
+                '天梁': { type: '天府', yin: '阳', wx: '土', attr: '吉', desc: '荫星，慈悲、正直、稳重。主福荫、长寿、智慧。' },
+                '七杀': { type: '天府', yin: '阳', wx: '金', attr: '凶', desc: '将星，勇猛、果断、刚强。主变动、挑战、权威。' },
+                '破军': { type: '天府', yin: '阳', wx: '水', attr: '凶', desc: '耗星，破坏、革新、冒险。主变动、开创、损耗。' }
+            };
+
+            // ========== 辅星定义 ==========
+            const FU_XING = {
+                '文昌': { attr: '吉', desc: '文星，才华、学业、文艺' },
+                '文曲': { attr: '吉', desc: '才星，口才、才艺、智慧' },
+                '左辅': { attr: '吉', desc: '助力星，贵人、助手、福气' },
+                '右弼': { attr: '吉', desc: '助力星，助力、包容、协调' },
+                '天魁': { attr: '吉', desc: '天乙贵人，提携、机遇、助力' },
+                '天钺': { attr: '吉', desc: '玉堂贵人，助力、偏财、意外之喜' },
+                '禄存': { attr: '吉', desc: '财星，财富、储蓄、稳定' },
+                '擎羊': { attr: '凶', desc: '刑星，挫折、争斗、伤害' },
+                '陀罗': { attr: '凶', desc: '忌星，拖延、纠缠、阻碍' },
+                '火星': { attr: '凶', desc: '煞星，急躁、冲动、灾难' },
+                '铃星': { attr: '凶', desc: '煞星，忧思、烦恼、暗斗' },
+                '地空': { attr: '凶', desc: '空亡，落空、虚耗、意外' },
+                '地劫': { attr: '凶', desc: '劫煞，破财、损失、变动' },
+                '天马': { attr: '吉', desc: '驿马，变动、远行、奔波' },
+                '天刑': { attr: '凶', desc: '刑伤，疾病、官非、孤独' },
+                '天姚': { attr: '凶', desc: '桃花，风流、暧昧、诱惑' }
+            };
+
+            // ========== 天干地支 ==========
+            const TIAN_GAN = ['甲','乙','丙','丁','戊','己','庚','辛','壬','癸'];
+            const DI_ZHI = ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
+
+            // ========== 紫微斗数排盘核心算法 ==========
+            
+            // 根据农历年月日时和性别排盘
+            function paiPan(year, month, day, hour, gender) {
+                // 1. 确定农历年干支、月干支、日干支
+                const lunar = Lunar.fromYmd(year, month, day);
+                const yearGanZhi = lunar.getYearInGanZhiExact();
+                const yearGan = lunar.getYearGanExact();
+                const yearZhi = lunar.getYearZhiExact();
+                const monthGan = lunar.getMonthGanExact();
+                const monthZhi = lunar.getMonthZhiExact();
+                
+                // 2. 确定命宫和身宫
+                const hourZhiIdx = getHourZhiIndex(hour);
+                
+                // 命宫: 寅宫起正月，顺数到出生月，再逆数到出生时
+                let mingGong = (2 + (month - 1)) % 12; // 寅(2)起正月
+                mingGong = (mingGong - hourZhiIdx + 12) % 12;
+                
+                // 身宫: 寅宫起正月，顺数到出生月，再顺数到出生时
+                let shenGong = (2 + (month - 1)) % 12;
+                shenGong = (shenGong + hourZhiIdx) % 12;
+                
+                // 3. 定十二宫
+                const gongNames = ['命宫','兄弟宫','夫妻宫','子女宫','财帛宫','疾厄宫','迁移宫','交友宫','官禄宫','田宅宫','福德宫','父母宫'];
+                const gongs = {};
+                for (let i = 0; i < 12; i++) {
+                    const idx = (mingGong + i) % 12;
+                    gongs[gongNames[i]] = {
+                        zhiIdx: idx,
+                        zhi: DI_ZHI[idx],
+                        stars: [],
+                        assist: [],
+                        hua: [],
+                        isMing: (i === 0),
+                        isShen: (idx === shenGong)
+                    };
+                }
+                
+                // 4. 定紫微星位置
+                // 用五行局和生日数
+                const wuxingJu = getWuXingJu(yearGan, yearZhi, month, day);
+                const ziWeiZhiIdx = getZiWeiPosition(yearGan, month, day, wuxingJu);
+                
+                // 5. 安紫微系主星
+                const ziWeiStars = ['紫微','天机','空','太阳','武曲','天同','空','廉贞'];
+                const ziWeiStart = ziWeiZhiIdx;
+                for (let i = 0; i < ziWeiStars.length; i++) {
+                    const star = ziWeiStars[i];
+                    if (star === '空') continue;
+                    const idx = (ziWeiStart + i) % 12;
+                    for (const gongName in gongs) {
+                        if (gongs[gongName].zhiIdx === idx) {
+                            gongs[gongName].stars.push(star);
+                        }
+                    }
+                }
+                
+                // 6. 安天府系主星
+                const tianFuZhiIdx = (ziWeiZhiIdx + 12 - 4) % 12; // 天府在紫微的对面
+                const tianFuStars = ['天府','太阴','贪狼','巨门','天相','天梁','七杀','破军'];
+                for (let i = 0; i < tianFuStars.length; i++) {
+                    const star = tianFuStars[i];
+                    const idx = ((tianFuZhiIdx - i) + 12) % 12;
+                    for (const gongName in gongs) {
+                        if (gongs[gongName].zhiIdx === idx) {
+                            gongs[gongName].stars.push(star);
+                        }
+                    }
+                }
+                
+                // 7. 安辅星（简化版——仅左辅右弼文昌文曲天魁天钺）
+                // 左辅: 辰宫起正月初一顺数至生日
+                const zuoFuIdx = (4 + day - 1) % 12; // 辰(4)起
+                for (const gongName in gongs) {
+                    if (gongs[gongName].zhiIdx === zuoFuIdx) {
+                        gongs[gongName].assist.push('左辅');
+                    }
+                }
+                // 右弼: 戌宫起正月初一逆数至生日
+                const youBiIdx = (10 - (day - 1) + 12) % 12; // 戌(10)起
+                for (const gongName in gongs) {
+                    if (gongs[gongName].zhiIdx === youBiIdx) {
+                        gongs[gongName].assist.push('右弼');
+                    }
+                }
+                // 文昌: 戌宫起子时逆数至生时
+                const wenChangIdx = (10 - hourZhiIdx + 12) % 12;
+                for (const gongName in gongs) {
+                    if (gongs[gongName].zhiIdx === wenChangIdx) {
+                        gongs[gongName].assist.push('文昌');
+                    }
+                }
+                // 文曲: 辰宫起子时顺数至生时
+                const wenQuIdx = (4 + hourZhiIdx) % 12;
+                for (const gongName in gongs) {
+                    if (gongs[gongName].zhiIdx === wenQuIdx) {
+                        gongs[gongName].assist.push('文曲');
+                    }
+                }
+                // 天魁: 年干定
+                const tianKuiIdx = getTianKuiIndex(yearGan);
+                for (const gongName in gongs) {
+                    if (gongs[gongName].zhiIdx === tianKuiIdx) {
+                        gongs[gongName].assist.push('天魁');
+                    }
+                }
+                // 天钺: 年干定
+                const tianYueIdx = getTianYueIndex(yearGan);
+                for (const gongName in gongs) {
+                    if (gongs[gongName].zhiIdx === tianYueIdx) {
+                        gongs[gongName].assist.push('天钺');
+                    }
+                }
+                
+                // 8. 定四化（简化版，用年干）
+                setHua(yearGan, gongs);
+                
+                return {
+                    gongs: gongs,
+                    mingGong: mingGong,
+                    shenGong: shenGong,
+                    yearGanZhi: yearGanZhi,
+                    yearGan: yearGan,
+                    yearZhi: yearZhi,
+                    monthGan: monthGan,
+                    monthZhi: monthZhi,
+                    wuxingJu: wuxingJu,
+                    ziWeiZhi: DI_ZHI[ziWeiZhiIdx]
+                };
+            }
+            
+            function getHourZhiIndex(hour) {
+                // hour 是输入的小时数 0-23
+                if (hour >= 23 || hour < 1) return 0; // 子时
+                if (hour >= 1 && hour < 3) return 1;
+                if (hour >= 3 && hour < 5) return 2;
+                if (hour >= 5 && hour < 7) return 3;
+                if (hour >= 7 && hour < 9) return 4;
+                if (hour >= 9 && hour < 11) return 5;
+                if (hour >= 11 && hour < 13) return 6;
+                if (hour >= 13 && hour < 15) return 7;
+                if (hour >= 15 && hour < 17) return 8;
+                if (hour >= 17 && hour < 19) return 9;
+                if (hour >= 19 && hour < 21) return 10;
+                if (hour >= 21 && hour < 23) return 11;
+                return 0;
+            }
+            
+            function getWuXingJu(yGan, yZhi, month, day) {
+                // 简化五行局
+                const ganIdx = TIAN_GAN.indexOf(yGan);
+                const zhiIdx = DI_ZHI.indexOf(yZhi);
+                const idx = (ganIdx + zhiIdx) % 5;
+                const jus = ['水二局','木三局','金四局','土五局','火六局'];
+                return jus[idx];
+            }
+            
+            function getZiWeiPosition(yGan, month, day, ju) {
+                // 简化版紫微定位
+                const ganIdx = TIAN_GAN.indexOf(yGan);
+                // 根据生日和五行局推算
+                const base = (ganIdx * 2 + day) % 12;
+                return base;
+            }
+            
+            function getTianKuiIndex(yGan) {
+                const map = { '甲':1,'乙':0,'丙':6,'丁':5,'戊':2,'己':2,'庚':7,'辛':7,'壬':3,'癸':3 };
+                const zhi = map[yGan] || 4;
+                return zhi;
+            }
+            
+            function getTianYueIndex(yGan) {
+                const map = { '甲':6,'乙':5,'丙':7,'丁':6,'戊':0,'己':0,'庚':1,'辛':1,'壬':4,'癸':4 };
+                const zhi = map[yGan] || 2;
+                return zhi;
+            }
+            
+            function setHua(yGan, gongs) {
+                // 四化简化版
+                let huaMap = {};
+                switch(yGan) {
+                    case '甲': huaMap = { '廉贞':'化禄','破军':'化权','武曲':'化科','太阳':'化忌' }; break;
+                    case '乙': huaMap = { '天机':'化禄','天梁':'化权','紫微':'化科','太阴':'化忌' }; break;
+                    case '丙': huaMap = { '天同':'化禄','天机':'化权','文昌':'化科','廉贞':'化忌' }; break;
+                    case '丁': huaMap = { '太阴':'化禄','天同':'化权','天机':'化科','巨门':'化忌' }; break;
+                    case '戊': huaMap = { '贪狼':'化禄','太阴':'化权','右弼':'化科','天机':'化忌' }; break;
+                    case '己': huaMap = { '武曲':'化禄','贪狼':'化权','天梁':'化科','文曲':'化忌' }; break;
+                    case '庚': huaMap = { '太阳':'化禄','武曲':'化权','太阴':'化科','天同':'化忌' }; break;
+                    case '辛': huaMap = { '巨门':'化禄','太阳':'化权','文曲':'化科','文昌':'化忌' }; break;
+                    case '壬': huaMap = { '天梁':'化禄','紫微':'化权','左辅':'化科','武曲':'化忌' }; break;
+                    case '癸': huaMap = { '破军':'化禄','巨门':'化权','太阴':'化科','贪狼':'化忌' }; break;
+                }
+                for (const gongName in gongs) {
+                    const gong = gongs[gongName];
+                    gong.stars.forEach(function(star) {
+                        if (huaMap[star]) {
+                            gong.hua.push(star + '·' + huaMap[star]);
+                        }
+                    });
+                }
+            }
+
+            // ========== 解读数据库 ==========
+            function getGongInterpretation(gongName, stars, assist, hua) {
+                const data = {
+                    '命宫': {
+                        meaning: '命宫代表你天生的性格、气质、命运走向。',
+                        advice: '命宫星曜组合决定了你的基本人生格局。'
+                    },
+                    '兄弟宫': {
+                        meaning: '兄弟宫代表兄弟姐妹的关系、朋友中的同辈缘分。',
+                        advice: '此宫星曜好则手足情深，反之则易有摩擦。'
+                    },
+                    '夫妻宫': {
+                        meaning: '夫妻宫代表婚姻状况、配偶特质、感情模式。',
+                        advice: '吉星多则婚姻美满，凶星多则需用心经营。'
+                    },
+                    '子女宫': {
+                        meaning: '子女宫代表子女缘分、教育方式、子女成就。',
+                        advice: '吉星多则子女贤孝，凶星多则需多加引导。'
+                    },
+                    '财帛宫': {
+                        meaning: '财帛宫代表财运状况、理财能力、赚钱方式。',
+                        advice: '财星入旺则财运亨通，煞星多则需谨慎理财。'
+                    },
+                    '疾厄宫': {
+                        meaning: '疾厄宫代表健康状况、体质强弱、疾病倾向。',
+                        advice: '吉星多则身强体健，凶星多则需注意养生。'
+                    },
+                    '迁移宫': {
+                        meaning: '迁移宫代表外出发展、人际应酬、环境变动。',
+                        advice: '吉星多则外出顺利，凶星多则易有波折。'
+                    },
+                    '交友宫': {
+                        meaning: '交友宫代表朋友关系、社交圈子、下属缘分。',
+                        advice: '吉星多则朋友得力，凶星多则需防小人。'
+                    },
+                    '官禄宫': {
+                        meaning: '官禄宫代表事业运、职业选择、社会地位。',
+                        advice: '官星强则事业有成，煞星多则需稳扎稳打。'
+                    },
+                    '田宅宫': {
+                        meaning: '田宅宫代表房产运、家庭环境、积蓄能力。',
+                        advice: '吉星多则家宅兴旺，凶星多则需谨慎投资。'
+                    },
+                    '福德宫': {
+                        meaning: '福德宫代表福气、精神生活、晚年运势。',
+                        advice: '吉星多则福泽深厚，凶星多则需修身养性。'
+                    },
+                    '父母宫': {
+                        meaning: '父母宫代表父母关系、家庭背景、长辈缘分。',
+                        advice: '吉星多则得父母庇佑，凶星多则需自我奋斗。'
+                    }
+                };
+                return data[gongName] || { meaning: '', advice: '' };
+            }
+
+            function getStarInterpretation(starName) {
+                return ZHU_XING[starName] || { desc: '' };
+            }
+
+            function getHuaInterpretation(huaStr) {
+                if (!huaStr) return '';
+                const parts = huaStr.split('·');
+                if (parts.length < 2) return '';
+                const star = parts[0];
+                const hua = parts[1];
+                const huaMeanings = {
+                    '化禄': '增加财运、福气、顺利',
+                    '化权': '增加权威、能力、掌控力',
+                    '化科': '增加名声、人缘、考试运',
+                    '化忌': '增加压力、考验、需注意的方面'
+                };
+                return star + '「' + hua + '」：' + (huaMeanings[hua] || '');
+            }
+
+            function getOverallPattern(gongs) {
+                // 判断基本格局
+                let goodStars = 0, badStars = 0;
+                let goodGongs = 0, badGongs = 0;
+                for (const name in gongs) {
+                    const g = gongs[name];
+                    g.stars.forEach(function(s) {
+                        if (ZHU_XING[s] && ZHU_XING[s].attr === '吉') goodStars++;
+                        if (ZHU_XING[s] && ZHU_XING[s].attr === '凶') badStars++;
+                    });
+                }
+                const mingGong = gongs['命宫'];
+                const hasGoodMing = mingGong.stars.some(function(s) { return ZHU_XING[s] && ZHU_XING[s].attr === '吉'; });
+                const hasBadMing = mingGong.stars.some(function(s) { return ZHU_XING[s] && ZHU_XING[s].attr === '凶'; });
+
+                let pattern = '';
+                let detail = '';
+                if (goodStars > badStars * 2 && hasGoodMing) {
+                    pattern = '上等格局';
+                    detail = '命盘中吉星众多，尤其是命宫得吉星坐守，一生福泽深厚，贵人运强，事业顺利。适合发挥领导才能，在管理、创业等领域有较大成就。';
+                } else if (goodStars > badStars) {
+                    pattern = '中上格局';
+                    detail = '命盘吉星多于凶星，整体运势良好。虽有波折但能逢凶化吉。事业上有一定成就，需注意在得意时保持谦虚，善待他人。';
+                } else if (goodStars === badStars) {
+                    pattern = '中等格局';
+                    detail = '命盘吉凶参半，人生有起有伏。需要在顺境时积累，逆境时忍耐。通过后天的努力和学习，可以改善命运。';
+                } else {
+                    pattern = '需努力格局';
+                    detail = '命盘中煞星较多，人生挑战较多。但正所谓"宝剑锋从磨砺出"，通过不断努力和自我提升，可以突破困境，成就非凡。';
+                }
+                return { pattern: pattern, detail: detail };
+            }
+
+            // ========== 更新界面 ==========
+            function updateResult(dateStr, hour, gender) {
+                if (!dateStr) return;
+                const parts = dateStr.split('-');
+                const year = parseInt(parts[0]);
+                const month = parseInt(parts[1]);
+                const day = parseInt(parts[2]);
+
+                // 转换为农历
+                const solar = Solar.fromYmd(year, month, day);
+                const lunar = solar.getLunar();
+                const lunarYear = lunar.getYear();
+                const lunarMonth = lunar.getMonth();
+                const lunarDay = lunar.getDay();
+
+                // 排盘
+                const pan = paiPan(lunarYear, lunarMonth, lunarDay, hour, gender);
+                const gongs = pan.gongs;
+
+                document.getElementById('resultArea').classList.add('show');
+
+                // 基本信息
+                document.getElementById('baseInfo').innerHTML =
+                    '<span class="ib-l">公历</span><span class="ib-v">' + year + '年' + month + '月' + day + '日</span>' +
+                    '<span class="sep">｜</span>' +
+                    '<span class="ib-l">农历</span><span class="ib-v">' + lunar.getYearInChinese() + '年 ' + lunar.getMonthInChinese() + '月 ' + lunar.getDayInChinese() + '日</span>' +
+                    '<span class="sep">｜</span>' +
+                    '<span class="ib-l">时辰</span><span class="ib-v">' + ZHI[getHourZhiIndex(hour)] + '时</span>' +
+                    '<span class="sep">｜</span>' +
+                    '<span class="ib-l">性别</span><span class="ib-v">' + (gender === 'M' ? '男' : '女') + '</span>' +
+                    '<span class="sep">｜</span>' +
+                    '<span class="ib-l">五行局</span><span class="ib-v">' + pan.wuxingJu + '</span>' +
+                    '<span class="sep">｜</span>' +
+                    '<span class="ib-l">紫微在</span><span class="ib-v">' + pan.ziWeiZhi + '</span>';
+
+                // 命盘表格
+                const gongOrder = ['命宫','兄弟宫','夫妻宫','子女宫','财帛宫','疾厄宫','迁移宫','交友宫','官禄宫','田宅宫','福德宫','父母宫'];
+                const tableOrder = [
+                    ['父母宫','福德宫','田宅宫'],
+                    ['官禄宫','中','交友宫'],
+                    ['迁移宫','疾厄宫','财帛宫'],
+                    ['子女宫','夫妻宫','兄弟宫'],
+                    ['命宫','','']  // 最后一行只有一格
+                ];
+                // 实际用4行3列显示
+                const displayOrder = [
+                    ['田宅宫','官禄宫','交友宫'],
+                    ['福德宫','中','迁移宫'],
+                    ['父母宫','疾厄宫','子女宫'],
+                    ['命宫','财帛宫','夫妻宫'],
+                    ['兄弟宫','','']
+                ];
+                // 更好看的排法：四行三列
+                const chartOrder = [
+                    ['田宅宫','官禄宫','交友宫'],
+                    ['福德宫','中','迁移宫'],
+                    ['父母宫','疾厄宫','子女宫'],
+                    ['命宫','财帛宫','夫妻宫'],
+                    ['','兄弟宫','']
+                ];
+
+                const table = document.getElementById('chartTable');
+                table.innerHTML = '';
+                chartOrder.forEach(function(row) {
+                    const tr = document.createElement('tr');
+                    row.forEach(function(gongName) {
+                        const td = document.createElement('td');
+                        if (gongName === '中') {
+                            td.innerHTML = '<div style="font-size:20px;color:#f7d49e;font-weight:700;">✦</div><div style="font-size:11px;color:#7a6e58;">中宫</div>';
+                        } else if (gongName === '') {
+                            td.innerHTML = '';
+                        } else {
+                            const g = gongs[gongName];
+                            if (g) {
+                                if (g.isMing) td.classList.add('cp-self');
+                                let html = '<div class="cp-gong">' + gongName + (g.isShen ? '(身)' : '') + '</div>';
+                                // 主星
+                                g.stars.forEach(function(s) {
+                                    const cls = (s === '紫微' || s === '天府') ? 'major' : '';
+                                    html += '<div class="cp-main ' + cls + '">' + s + '</div>';
+                                });
+                                if (g.stars.length === 0) html += '<div class="cp-empty">—</div>';
+                                // 辅星
+                                g.assist.forEach(function(a) {
+                                    html += '<div class="cp-assist">' + a + '</div>';
+                                });
+                                // 四化
+                                g.hua.forEach(function(h) {
+                                    html += '<div class="cp-hua">' + h + '</div>';
+                                });
+                                td.innerHTML = html;
+                            } else {
+                                td.innerHTML = '<div class="cp-empty">—</div>';
+                            }
+                        }
+                        tr.appendChild(td);
+                    });
+                    table.appendChild(tr);
+                });
+
+                // 命宫解读
+                const mingGong = gongs['命宫'];
+                const lifeEl = document.getElementById('lifeGong');
+                lifeEl.innerHTML = '';
+                const mingData = getGongInterpretation('命宫', mingGong.stars, mingGong.assist, mingGong.hua);
+                let mingHTML = '<div class="gong-item">';
+                mingHTML += '<div class="gi-header"><span class="gi-name">命宫</span>';
+                mingGong.stars.forEach(function(s) {
+                    const info = getStarInterpretation(s);
+                    const cls = info.attr === '吉' ? 'good' : 'bad';
+                    mingHTML += '<span class="gi-tag ' + cls + '">' + s + '</span>';
+                });
+                mingGong.assist.forEach(function(a) {
+                    mingHTML += '<span class="gi-tag">' + a + '</span>';
+                });
+                mingHTML += '</div>';
+                if (mingGong.hua.length > 0) {
+                    mingHTML += '<div class="gi-hua">' + mingGong.hua.map(function(h) { return getHuaInterpretation(h); }).join('<br>') + '</div>';
+                }
+                mingHTML += '<div class="gi-meaning">';
+                mingGong.stars.forEach(function(s) {
+                    const info = getStarInterpretation(s);
+                    if (info.desc) mingHTML += '<b>' + s + '：</b>' + info.desc + '<br>';
+                });
+                mingHTML += '</div>';
+                mingHTML += '<div class="gi-advice">' + mingData.advice + '</div>';
+                mingHTML += '</div>';
+                lifeEl.innerHTML = mingHTML;
+
+                // 十二宫详细解读
+                const allEl = document.getElementById('allGongs');
+                allEl.innerHTML = '';
+                gongOrder.forEach(function(name) {
+                    if (name === '命宫') return; // 命宫已单独显示
+                    const g = gongs[name];
+                    const data = getGongInterpretation(name, g.stars, g.assist, g.hua);
+                    let html = '<div class="gong-item">';
+                    html += '<div class="gi-header"><span class="gi-name">' + name + '</span>';
+                    g.stars.forEach(function(s) {
+                        const info = getStarInterpretation(s);
+                        const cls = info.attr === '吉' ? 'good' : 'bad';
+                        html += '<span class="gi-tag ' + cls + '">' + s + '</span>';
+                    });
+                    g.assist.forEach(function(a) {
+                        const info = FU_XING[a];
+                        const cls = info && info.attr === '吉' ? 'good' : 'bad';
+                        html += '<span class="gi-tag ' + cls + '">' + a + '</span>';
+                    });
+                    html += '</div>';
+                    if (g.hua.length > 0) {
+                        html += '<div class="gi-hua">' + g.hua.map(function(h) { return getHuaInterpretation(h); }).join('<br>') + '</div>';
+                    }
+                    html += '<div class="gi-meaning">' + data.meaning + '<br>';
+                    g.stars.forEach(function(s) {
+                        const info = getStarInterpretation(s);
+                        if (info.desc) html += '<b>' + s + '：</b>' + info.desc + '<br>';
+                    });
+                    html += '</div>';
+                    html += '<div class="gi-advice">' + data.advice + '</div>';
+                    html += '</div>';
+                    allEl.innerHTML += html;
+                });
+
+                // 四化
+                const huaEl = document.getElementById('huaSection');
+                let huaHTML = '<div class="gi-header"><span class="gi-name">四化飞星</span></div>';
+                let hasHua = false;
+                gongOrder.forEach(function(name) {
+                    const g = gongs[name];
+                    g.hua.forEach(function(h) {
+                        hasHua = true;
+                        huaHTML += '<div class="gi-hua">' + name + '：' + h + ' — ' + getHuaInterpretation(h) + '</div>';
+                    });
+                });
+                if (!hasHua) huaHTML += '<div class="gi-meaning">此命盘无四化飞星（简化排盘）</div>';
+                huaEl.innerHTML = huaHTML;
+
+                // 格局
+                const pattern = getOverallPattern(gongs);
+                document.getElementById('patternSection').innerHTML =
+                    '<div class="gi-header"><span class="gi-name">' + pattern.pattern + '</span></div>' +
+                    '<div class="gi-meaning">' + pattern.detail + '</div>';
+            }
+
+            // ========== 初始化 ==========
+            document.getElementById('calcBtn').addEventListener('click', function() {
+                const dateVal = document.getElementById('birthDate').value;
+                const hour = parseInt(document.getElementById('birthHour').value);
+                const gender = document.getElementById('birthGender').value;
+                if (!dateVal) { alert('请选择出生日期'); return; }
+                updateResult(dateVal, hour, gender);
+            });
+
+            const today = new Date();
+            const y = today.getFullYear();
+            const m = String(today.getMonth() + 1).padStart(2, '0');
+            const d = String(today.getDate()).padStart(2, '0');
+            document.getElementById('birthDate').value = y + '-' + m + '-' + d;
+
+            window.addEventListener('DOMContentLoaded', function() {
+                setTimeout(function() {
+                    const dateVal = document.getElementById('birthDate').value;
+                    const hour = parseInt(document.getElementById('birthHour').value);
+                    const gender = document.getElementById('birthGender').value;
+                    updateResult(dateVal, hour, gender);
+                }, 150);
+            });
+        })();
+    </script>
+</body>
+</html>
