@@ -1,0 +1,834 @@
+/* ==========================================================================
+   136App - Mobile Web Base (Clean App Shell without iPhone Frame)
+   ========================================================================== */
+
+:root {
+  --app-primary: #00A86B;
+  --app-primary-dark: #00875A;
+  --app-primary-light: #E2F6EE;
+  --app-gold: #F59E0B;
+  --app-gold-light: #FEF3C7;
+  --app-bg: #FFFFFF;
+  --app-card-bg: #FFFFFF;
+  --app-text-main: #0F172A;
+  --app-text-muted: #64748B;
+  --app-text-sub: #94A3B8;
+  --app-border: rgba(0, 0, 0, 0.05);
+  --app-radius-sm: 12px;
+  --app-radius-md: 18px;
+  --app-radius-lg: 22px;
+  --app-radius-xl: 32px;
+  --app-shadow-soft: 0 8px 24px -4px rgba(0, 0, 0, 0.04), 0 2px 6px -1px rgba(0, 0, 0, 0.02);
+  --app-shadow-card: 0 12px 28px -6px rgba(0, 0, 0, 0.08);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  background-color: #F1F5F9;
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  justify-content: center;
+  align-items: stretch;
+  color: var(--app-text-main);
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+}
+
+/* ==========================================================================
+   Clean App Shell Container (Responsive, Mobile-proportioned, No Phone Frame)
+   ========================================================================== */
+.app-container {
+  position: relative;
+  width: 100%;
+  max-width: 430px;
+  min-height: 100vh;
+  min-height: 100dvh;
+  height: 100vh;
+  height: 100dvh;
+  background: #FFFFFF;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 0 35px rgba(0, 0, 0, 0.06);
+  border-left: 1px solid rgba(0, 0, 0, 0.04);
+  border-right: 1px solid rgba(0, 0, 0, 0.04);
+  margin: 0 auto;
+  overflow: hidden;
+}
+
+/* Mobile full-bleed */
+@media (max-width: 480px) {
+  body {
+    background-color: #FFFFFF;
+  }
+  .app-container {
+    max-width: 100%;
+    border-left: none;
+    border-right: none;
+    box-shadow: none;
+  }
+}
+
+/* ==========================================================================
+   Scrollable App Body
+   ========================================================================== */
+.app-content {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  padding: 0 18px 96px 18px; /* Bottom padding so content is not blocked by nav */
+  background: linear-gradient(180deg, #FFFFFF 0%, #F6FAF8 15%, #F4FAF7 100%);
+}
+
+.app-content::-webkit-scrollbar {
+  display: none;
+}
+.app-content {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* ==========================================================================
+   Header: Logo & Notification Bell
+   ========================================================================== */
+.app-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 0 14px 0;
+  position: sticky;
+  top: 0;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  z-index: 10;
+}
+
+.brand-link {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+  transition: opacity 0.2s ease;
+}
+
+.brand-link:hover {
+  opacity: 0.9;
+}
+
+.brand-logo-icon {
+  height: 42px;
+  width: auto;
+  object-fit: contain;
+  filter: drop-shadow(0 2px 4px rgba(0, 168, 107, 0.15));
+}
+
+.brand-slogan-wrap {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.slogan-title {
+  font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 2.4px;
+  color: #111827;
+  line-height: 1.25;
+  white-space: nowrap;
+}
+
+.slogan-sub {
+  font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
+  font-size: 8.5px;
+  font-weight: 600;
+  letter-spacing: 4.4px;
+  color: #475569;
+  line-height: 1.25;
+  white-space: nowrap;
+  margin-top: 2px;
+}
+
+.bell-btn {
+  position: relative;
+  background: none;
+  border: none;
+  padding: 4px;
+  cursor: pointer;
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.bell-btn:hover {
+  transform: scale(1.1) rotate(-8deg);
+}
+.bell-btn:active {
+  transform: scale(0.95);
+}
+
+.bell-icon-img {
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
+  filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.08));
+}
+
+/* ==========================================================================
+   Greeting Section
+   ========================================================================== */
+.greeting-section {
+  margin-bottom: 18px;
+  margin-top: 4px;
+}
+
+.greeting-sub {
+  font-size: 14.5px;
+  font-weight: 500;
+  color: var(--app-text-muted);
+  line-height: 1.2;
+}
+
+.greeting-name {
+  font-size: 25px;
+  font-weight: 800;
+  color: var(--app-text-main);
+  letter-spacing: -0.5px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 2px;
+}
+
+.waving-hand {
+  display: inline-block;
+  transform-origin: 70% 70%;
+  animation: wave 2.2s infinite;
+}
+
+@keyframes wave {
+  0% { transform: rotate(0deg); }
+  10% { transform: rotate(14deg); }
+  20% { transform: rotate(-8deg); }
+  30% { transform: rotate(14deg); }
+  40% { transform: rotate(-4deg); }
+  50% { transform: rotate(10deg); }
+  60% { transform: rotate(0deg); }
+  100% { transform: rotate(0deg); }
+}
+
+/* ==========================================================================
+   Member Card (Dark Metallic & Bronze 3D Glow)
+   ========================================================================== */
+.member-card {
+  position: relative;
+  background: radial-gradient(circle at 85% 35%, #4A3E26 0%, #1E2722 45%, #131B17 100%);
+  border-radius: 22px;
+  padding: 20px 18px 16px 18px;
+  color: #FFFFFF;
+  box-shadow: 
+    0 16px 32px -8px rgba(15, 27, 21, 0.45),
+    0 4px 12px rgba(0, 0, 0, 0.2),
+    inset 0 1px 1px rgba(255, 255, 255, 0.15);
+  overflow: hidden;
+  margin-bottom: 20px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.member-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 
+    0 20px 40px -8px rgba(15, 27, 21, 0.55),
+    0 6px 16px rgba(0, 0, 0, 0.25);
+}
+
+.member-card::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle at 80% 30%, rgba(245, 158, 11, 0.12) 0%, transparent 60%);
+  pointer-events: none;
+}
+
+.card-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.member-info-left {
+  flex: 1;
+  z-index: 2;
+}
+
+.member-title {
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: -0.3px;
+  line-height: 1.2;
+}
+
+.member-badge-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 5px;
+}
+
+.coin-icon-sm {
+  width: 17px;
+  height: 17px;
+  object-fit: contain;
+}
+
+.member-level-text {
+  font-size: 13px;
+  font-weight: 600;
+  color: #FBBF24;
+}
+
+.member-id-number {
+  font-family: 'SF Pro Display', -apple-system, monospace;
+  font-size: 14.5px;
+  font-weight: 600;
+  letter-spacing: 1.2px;
+  color: #E2E8F0;
+  margin-top: 10px;
+}
+
+/* 3D Bronze Medal on the right */
+.medal-container {
+  position: absolute;
+  right: 12px;
+  top: 10px;
+  width: 110px;
+  height: 110px;
+  z-index: 1;
+}
+
+.medal-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.3));
+  transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.member-card:hover .medal-img {
+  transform: scale(1.05) rotate(4deg);
+}
+
+/* Progress bar */
+.bp-progress-wrapper {
+  margin-top: 14px;
+  position: relative;
+  z-index: 2;
+}
+
+.bp-progress-bar {
+  position: relative;
+  width: 100%;
+  max-width: 250px;
+  height: 24px;
+  background: rgba(0, 0, 0, 0.45);
+  border: 1.5px solid var(--app-primary);
+  border-radius: 12px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.bp-progress-fill {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 24%;
+  background: linear-gradient(90deg, #00A86B 0%, #10B981 100%);
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(16, 185, 129, 0.6);
+  transition: width 1s ease-out;
+}
+
+.bp-progress-text {
+  position: relative;
+  z-index: 2;
+  font-size: 11.5px;
+  font-weight: 800;
+  color: #FFFFFF;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
+  letter-spacing: 0.3px;
+}
+
+.bp-hint-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 6px;
+  position: relative;
+  z-index: 2;
+}
+
+.bp-hint-text {
+  font-size: 11.5px;
+  color: #CBD5E1;
+  font-weight: 500;
+}
+
+.card-action-btns {
+  display: flex;
+  gap: 10px;
+}
+
+.card-icon-btn {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #FFFFFF;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  backdrop-filter: blur(4px);
+}
+
+.card-icon-btn:hover {
+  background: rgba(255, 255, 255, 0.25);
+  transform: scale(1.08);
+}
+.card-icon-btn:active {
+  transform: scale(0.92);
+}
+
+/* ==========================================================================
+   Stat Cards (Unified 3-Column White Card Container)
+   ========================================================================= */
+.stats-container {
+  background: #FFFFFF;
+  border-radius: 20px;
+  padding: 16px 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: var(--app-shadow-soft);
+  border: 1px solid var(--app-border);
+  margin-bottom: 20px;
+}
+
+.stat-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  cursor: pointer;
+  padding: 4px 2px;
+  transition: transform 0.2s ease;
+}
+
+.stat-item:hover {
+  transform: translateY(-2px);
+}
+
+.stat-icon-img {
+  height: 52px;
+  width: auto;
+  object-fit: contain;
+  margin-bottom: 6px;
+  filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.05));
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.stat-item:hover .stat-icon-img {
+  transform: scale(1.1);
+}
+
+.stat-label {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--app-text-muted);
+  margin-bottom: 2px;
+  white-space: nowrap;
+}
+
+.stat-value {
+  font-size: 14.5px;
+  font-weight: 800;
+  color: var(--app-text-main);
+  letter-spacing: -0.3px;
+  white-space: nowrap;
+}
+
+.stat-divider {
+  width: 1px;
+  height: 48px;
+  background: #EDF2F7;
+  flex-shrink: 0;
+}
+
+/* ==========================================================================
+   Quick Actions Grid (4 Neumorphic Rounded Cards)
+   ========================================================================== */
+.quick-actions-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.action-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-decoration: none;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.action-card:hover {
+  transform: translateY(-3px);
+}
+.action-card:active {
+  transform: scale(0.94);
+}
+
+.action-icon-box {
+  width: 90px;
+  height: 90px;
+  max-width: 100%;
+  background: #FFFFFF;
+  border-radius: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 
+    0 10px 22px -4px rgba(0, 0, 0, 0.06),
+    0 2px 6px -1px rgba(0, 0, 0, 0.02),
+    inset 0 1px 1px rgba(255, 255, 255, 0.9);
+  border: 1px solid var(--app-border);
+  margin-bottom: 8px;
+  transition: box-shadow 0.2s ease;
+}
+
+.action-card:hover .action-icon-box {
+  box-shadow: 
+    0 14px 28px -4px rgba(0, 168, 107, 0.12),
+    0 4px 10px -1px rgba(0, 0, 0, 0.04);
+}
+
+.action-img {
+  width: 65px;
+  height: 65px;
+  object-fit: contain;
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.action-card:hover .action-img {
+  transform: scale(1.12);
+}
+
+.action-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: #334155;
+  text-align: center;
+  white-space: nowrap;
+}
+
+/* ==========================================================================
+   VIP Banner (Gold to Mint Luxury Gradient)
+   ========================================================================== */
+.vip-banner {
+  position: relative;
+  background: linear-gradient(115deg, #FDF4D9 0%, #F5FBF6 35%, #D7F4E6 70%, #ABE8CD 100%);
+  border-radius: 22px;
+  padding: 16px 16px;
+  display: flex;
+  align-items: center;
+  box-shadow: 
+    0 10px 24px -6px rgba(0, 168, 107, 0.12),
+    0 4px 10px -2px rgba(0, 0, 0, 0.03);
+  border: 1.5px solid rgba(255, 255, 255, 0.85);
+  overflow: hidden;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.vip-banner:hover {
+  transform: translateY(-2px);
+  box-shadow: 
+    0 16px 32px -6px rgba(0, 168, 107, 0.18),
+    0 6px 14px -2px rgba(0, 0, 0, 0.05);
+}
+
+.vip-banner:active {
+  transform: scale(0.98);
+}
+
+.vip-crown-left {
+  width: 68px;
+  height: 68px;
+  flex-shrink: 0;
+  margin-right: 12px;
+}
+
+.vip-crown-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  filter: drop-shadow(0 6px 12px rgba(245, 158, 11, 0.2));
+  transition: transform 0.3s ease;
+}
+
+.vip-banner:hover .vip-crown-img {
+  transform: rotate(-6deg) scale(1.08);
+}
+
+.vip-content-center {
+  flex: 1;
+  padding-right: 40px;
+  z-index: 2;
+}
+
+.vip-title-row {
+  font-size: 16.5px;
+  font-weight: 800;
+  color: #1E293B;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.vip-title-row i {
+  font-size: 13px;
+  font-weight: bold;
+  color: #475569;
+  transition: transform 0.2s ease;
+}
+
+.vip-banner:hover .vip-title-row i {
+  transform: translateX(4px);
+}
+
+.vip-desc {
+  font-size: 11.5px;
+  color: #475569;
+  line-height: 1.35;
+  margin-top: 4px;
+  font-weight: 500;
+}
+
+.vip-decor-right {
+  position: absolute;
+  right: -10px;
+  bottom: -15px;
+  width: 90px;
+  height: 90px;
+  opacity: 0.9;
+  pointer-events: none;
+}
+
+.vip-decor-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+/* ==========================================================================
+   Bottom Navigation Bar (Dock with Elevated FAB)
+   ========================================================================== */
+.bottom-nav-wrapper {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 76px;
+  background: rgba(255, 255, 255, 0.96);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-top: 1px solid rgba(0, 0, 0, 0.05);
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  padding: 0 12px 6px 12px;
+  z-index: 200;
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.04);
+}
+
+.nav-tab-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #64748B;
+  padding: 4px 0;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.nav-tab-item .tab-icon {
+  font-size: 22px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 2px;
+  transition: transform 0.2s ease;
+}
+
+.nav-tab-item .tab-label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: -0.2px;
+}
+
+/* Active tab style with light mint pill */
+.nav-tab-item.active {
+  color: var(--app-primary);
+}
+
+.nav-tab-item .tab-icon-pill {
+  width: 50px;
+  height: 32px;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 2px;
+  background: transparent;
+  transition: background 0.2s ease;
+}
+
+.nav-tab-item.active .tab-icon-pill {
+  background: #E2F6EE;
+}
+
+.nav-tab-item.active .tab-icon-pill i {
+  color: var(--app-primary);
+  font-size: 20px;
+}
+
+.nav-tab-item:hover {
+  color: var(--app-primary);
+}
+
+/* Center Floating Action Button (FAB) */
+.fab-center-btn {
+  position: relative;
+  top: -18px;
+  width: 66px;
+  height: 66px;
+  border-radius: 50%;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.25s ease;
+  filter: drop-shadow(0 10px 20px rgba(0, 168, 107, 0.45));
+}
+
+.fab-center-btn img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.fab-center-btn:hover {
+  transform: translateY(-4px) scale(1.06);
+  filter: drop-shadow(0 14px 26px rgba(0, 168, 107, 0.55));
+}
+
+.fab-center-btn:active {
+  transform: scale(0.92);
+}
+
+/* ==========================================================================
+   Modals & Toasts
+   ========================================================================== */
+.custom-modal-backdrop {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(5px);
+  z-index: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease;
+  padding: 20px;
+}
+
+.custom-modal-backdrop.show {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.custom-modal-dialog {
+  width: 100%;
+  max-width: 320px;
+  background: #FFFFFF;
+  border-radius: 28px;
+  padding: 24px;
+  text-align: center;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
+  transform: scale(0.85);
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.custom-modal-backdrop.show .custom-modal-dialog {
+  transform: scale(1);
+}
+
+/* Toast alert */
+.toast-notice {
+  position: absolute;
+  top: 30px;
+  left: 50%;
+  transform: translateX(-50%) translateY(-30px);
+  background: rgba(15, 23, 42, 0.92);
+  color: #FFFFFF;
+  padding: 10px 18px;
+  border-radius: 24px;
+  font-size: 13px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+  z-index: 600;
+  opacity: 0;
+  pointer-events: none;
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.toast-notice.show {
+  transform: translateX(-50%) translateY(0);
+  opacity: 1;
+}
